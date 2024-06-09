@@ -1,0 +1,23 @@
+l r0 d1 PrefabHash
+move r1 90
+move r2 90
+main:
+l r3 d0 Vertical
+slt r15 r3 r2
+beqz r15 if0else
+sub r1 90 r3
+j if0exit
+if0else:
+sgt r14 r3 r2
+beqz r14 if1exit
+add r1 90 r3
+if1exit:
+if0exit:
+move r2 r3
+jal setSolarPanels
+yield
+j main
+jr 4
+setSolarPanels:
+sb r0 Vertical r1
+j ra

@@ -1,0 +1,27 @@
+main:
+move r0 0.0001
+l r1 d4 Setting
+seq r15 r1 1
+beqz r15 if0exit
+move r0 0
+if0exit:
+l r2 d2 RatioPollutant
+sgt r15 r2 r0
+beqz r15 if1else
+s d3 On 1
+move r15 1
+jal enableSystem
+j if1exit
+if1else:
+s d3 On 0
+move r15 0
+jal enableSystem
+if1exit:
+yield
+j main
+jr 6
+enableSystem:
+s d0 On r15
+s d0 Mode 1
+s d1 On r15
+j ra

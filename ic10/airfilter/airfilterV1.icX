@@ -1,0 +1,41 @@
+alias ActiveVent d0
+alias AirFilter d1
+alias GasSensor d2
+alias IndicatorLight d3
+alias OverrideSwitch d4
+
+const defaultMinPollutantRatio = 0.0001
+
+main:
+    var minPollutantRatio = defaultMinPollutantRatio
+    var switchSetting = OverrideSwitch.Setting
+    if switchSetting == 1
+        minPollutantRatio = 0.0
+    end
+
+    var pollutantRatio = GasSensor.RatioPollutant
+
+    # TODO: Only enable if we are flush with power
+    if pollutantRatio > minPollutantRatio
+        IndicatorLight.On = 1
+        enableSystem(1)
+    else
+        IndicatorLight.On = 0
+        enableSystem(0)
+    end
+    yield
+j main
+
+function enableSystem(enabled)
+    ActiveVent.On = enabled
+    ActiveVent.Mode = 1 # Inward
+
+    AirFilter.On = enabled
+end
+
+#function updateDisplay(value)
+#    Display.Mode = 0
+#    Display.On = 1
+#    Display.Setting = value
+#    Display.Color = 4 # Red
+#end

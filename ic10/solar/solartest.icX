@@ -1,0 +1,26 @@
+alias DaylightSensor d0
+alias SolarPanel1 d1
+var SOLAR_HASH = d1.PrefabHash
+
+var vertical = 90
+var lastReading = 90
+
+main:
+    var verticalReading = DaylightSensor.Vertical
+
+    if verticalReading < lastReading
+        vertical = 90 - verticalReading 
+    else
+        if verticalReading > lastReading
+            vertical = 90 + verticalReading
+        end
+    end
+    lastReading = verticalReading
+
+    setSolarPanels()
+    yield
+j main
+
+function setSolarPanels
+    d(SOLAR_HASH).Vertical = vertical
+end
