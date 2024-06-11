@@ -5,6 +5,10 @@ alias IndicatorLight d3
 alias OverrideSwitch d4
 
 const defaultMinPollutantRatio = 0.0001
+const criticalPollutantRatio = 0.01
+const colorOk = 2
+const colorWarn = 3
+const colorCritical = 4
 
 main:
     var minPollutantRatio = defaultMinPollutantRatio
@@ -14,6 +18,18 @@ main:
     end
 
     var pollutantRatio = GasSensor.RatioPollutant
+
+    var color = 0
+    if pollutantRatio >= criticalPollutantRatio
+        color = colorCritical
+    end
+    if pollutantRatio < criticalPollutantRatio
+        color = colorWarn
+    end
+    if pollutantRatio < defaultMinPollutantRatio
+        color = colorOk
+    end
+    IndicatorLight.Color = color
 
     # TODO: Only enable if we are flush with power
     if pollutantRatio > minPollutantRatio

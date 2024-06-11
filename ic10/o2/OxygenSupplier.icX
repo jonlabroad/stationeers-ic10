@@ -1,0 +1,23 @@
+alias IceCrusher d0
+alias AirFilter d1
+alias Analyzer d2
+alias Regulator d3
+
+const shutoffPressure = 40000 #40 MPa
+
+main:
+    Analyzer.On = 1
+    var tankPressure = Analyzer.Pressure
+    var enable = 1
+    if tankPressure > shutoffPressure
+        enable = 0
+    end
+    enableSystem(enable)
+
+    yield
+j main
+
+function enableSystem(enabled)
+    IceCrusher.On = enabled
+    AirFilter.On = enabled
+end

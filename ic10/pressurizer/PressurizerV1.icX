@@ -1,0 +1,29 @@
+alias IceCrusher d1
+alias AirFilter d2
+alias ManualSwitch d5
+
+const volumePumpVol = 10 #L
+const regulatorPressure = 3000 #kPa
+
+main:
+    var switchOn = ManualSwitch.Setting
+    if switchOn == 1
+         enableSystem(1)     
+    else
+        enableSystem(0)
+    end
+
+    yield
+j main
+
+function enableSystem(enabled)
+    IceCrusher.On = enabled
+    AirFilter.On = enabled
+end
+
+#function updateDisplay(value)
+#    Display.Mode = 0
+#    Display.On = 1
+#    Display.Setting = value
+#    Display.Color = 4 # Red
+#end
