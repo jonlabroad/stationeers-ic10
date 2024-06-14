@@ -1,29 +1,81 @@
-alias IceCrusher d1
-alias AirFilter d2
-alias ManualSwitch d5
+alias Furnace d0
+alias InputAnalyzer d1
+alias VolOxyMixer d2
+alias TempDisplay d3
+alias PressureDisplay d4
 
-const volumePumpVol = 10 #L
-const regulatorPressure = 3000 #kPa
+const pressureInVol = 10 #L
+const pressureOutVol = 10 #L
+
+const targetPressureLow = 900 #kPa
+const targetPressureHigh = 2300 #kPa
+const targetFurnacePressure = 1500 #kPa
+const targetTempLow = 700 #K
+const targetTempHigh = 9000 #K
+const targetFurnaceTemp = 2000 #K
+
+const volOxyShutoffPressure = 5000 #kPa
+const volMixPercentage = 33.333 #66.67
+
+Furnace.On = 1
+InputAnalyzer.On = 1
+VolOxyMixer.On = 1
+
+Furnace.SettingInput = 0
+Furnace.SettingOutput = 0
 
 main:
-    var switchOn = ManualSwitch.Setting
-    if switchOn == 1
-         enableSystem(1)     
+    # Input Mixer
+    var inputGasPressure = InputAnalyzer.Pressure
+    if inputGasPressure > volOxyShutoffPressure
+        VolOxyMixer.On = 0
     else
-        enableSystem(0)
+        VolOxyMixer.On = 1
+        VolOxyMixer.Setting = volMixPercentage
     end
+
+    var currentPressure = Furnace.Pressure
+
+    var settingInput = 0
+    var pressureDisplayColor = 0
+    if currentPressure < targetPressureLow
+        # Still need more pressure, need input
+        pressureDisplayColor = 0
+        settingInput = pressureInVol
+        Furnace.SettingOutput = 0
+    end
+    if currentPressure > targetPressureLow && currentPressure < targetPressureHigh
+        pressureDisplayColor = 2
+        # Pressure target reached, no output req
+        Furnace.SettingOutput = 0
+    end
+    if currentPressure > targetPressureHigh
+        # Pressure too high
+        pressureDisplayColor= 4
+        Furnace.SettingOutput = pressureOutVol
+    end
+    PressureDisplay.Color = pressureDisplayColor
+
+    var currentTemp = Furnace.Temperature
+    var tempDisplayColor = 0
+    if currentTemp < targetFurnaceTemp
+        # Need more temp
+        tempDisplayColor = 0
+        settingInput = pressureInVol
+    end
+    if currentTemp > targetTempLow && currentTemp < targetTempHigh
+        tempDisplayColor = 2
+        # Temp target reached
+        # TODO: Don't necessarily want to shut it off if we still need pressure
+        settingInput = 0
+    end
+    if currentTemp > targetPressureHigh
+        tempDisplayColor = 4
+        # Can't actually do anything right now to force lower temp
+    end
+    TempDisplay.Color = tempDisplayColor
+
+    Furnace.SettingInput = settingInput
 
     yield
 j main
-
-function enableSystem(enabled)
-    IceCrusher.On = enabled
-    AirFilter.On = enabled
-end
-
-#function updateDisplay(value)
-#    Display.Mode = 0
-#    Display.On = 1
-#    Display.Setting = value
-#    Display.Color = 4 # Red
-#end
