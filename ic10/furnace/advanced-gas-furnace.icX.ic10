@@ -1,0 +1,18 @@
+main:
+l r0 d5 Setting
+seq r15 r0 1
+beqz r15 if0else
+move r14 1
+jal enableSystem
+j if0exit
+if0else:
+move r14 0
+jal enableSystem
+if0exit:
+yield
+j main
+jr 5
+enableSystem:
+s d1 On r15
+s d2 On r15
+j ra
