@@ -1,0 +1,19 @@
+alias Silo d0
+alias InputValve d1
+alias Autolaythe d2
+alias InputSlotQuantity d3
+
+Silo.On = 1
+Silo.Open = 1
+
+InputValve.On = 1
+InputValve.Open = 0
+InputValve.Quantity = 1
+
+Autolaythe.On = 1
+
+main:
+    var currIngotNum = InputSlotQuantity.
+
+    yield
+j main
