@@ -1,0 +1,54 @@
+alias AutolatheSwitch d0
+alias PipeBenderSwitch d1
+alias ElectronicsSwitch d2
+alias ToolsSwitch d3
+alias Destination d5
+
+const ENABLED = 1
+const DISABLED = 0
+
+AutolatheSwitch.Open = DISABLED
+PipeBenderSwitch.Open = DISABLED
+
+main:
+    var autolatheEnable = AutolatheSwitch.Open
+    if autolatheEnable == ENABLED
+        Destination.Setting = 1
+        PipeBenderSwitch.Open = DISABLED
+        ElectronicsSwitch.Open = DISABLED
+        ToolsSwitch.Open = DISABLED
+        j main
+    end
+
+    var pipeBenderEnable = PipeBenderSwitch.Open
+    if pipeBenderEnable == ENABLED
+        Destination.Setting = 2
+        AutolatheSwitch.Open = DISABLED
+        ElectronicsSwitch.Open = DISABLED
+        ToolsSwitch.Open = DISABLED
+        j main
+    end
+
+    var electronicsEnable = ElectronicsSwitch.Open
+    if electronicsEnable == ENABLED
+        Destination.Setting = 3
+        AutolatheSwitch.Open = DISABLED
+        PipeBenderSwitch.Open = DISABLED
+        ToolsSwitch.Open = DISABLED
+        j main
+    end
+
+    var toolsEnable = ToolsSwitch.Open
+    if toolsEnable == ENABLED
+        Destination.Setting = 4
+        AutolatheSwitch.Open = DISABLED
+        PipeBenderSwitch.Open = DISABLED
+        ElectronicsSwitch.Open = DISABLED
+        j main
+    end
+
+    # If we fall through to here, it is disabled
+    Destination.Setting = 0
+
+    yield
+j main

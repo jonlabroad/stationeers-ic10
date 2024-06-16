@@ -1,0 +1,61 @@
+alias AutolatheLight d0
+alias PipeBenderLight d1
+alias ElectronicsLight d2
+alias ToolsLight d3
+alias OverheadLight d4
+alias Destination d5
+
+const ENABLED = 1
+const DISABLED = 0
+const COLOR = 2
+
+AutolatheLight.On = DISABLED
+PipeBenderLight.On = DISABLED
+ElectronicsLight.On = DISABLED
+OverheadLight.On = ENABLED
+ToolsLight.On = 1
+
+main:
+    var destination = Destination.Setting
+    if destination == 0
+        AutolatheLight.On = DISABLED
+        PipeBenderLight.On = DISABLED
+        ElectronicsLight.On = DISABLED
+        ToolsLight.On = DISABLED
+        OverheadLight.On = ENABLED
+    end
+
+    if destination == 1
+        AutolatheLight.On = ENABLED
+        PipeBenderLight.On = DISABLED
+        ElectronicsLight.On = DISABLED
+        ToolsLight.On = DISABLED
+        OverheadLight.On = DISABLED
+    end
+
+    if destination == 2
+        AutolatheLight.On = DISABLED
+        PipeBenderLight.On = ENABLED
+        ElectronicsLight.On = DISABLED
+        ToolsLight.On = DISABLED
+        OverheadLight.On = DISABLED
+    end
+
+    if destination == 3
+        AutolatheLight.On = DISABLED
+        PipeBenderLight.On = DISABLED
+        ElectronicsLight.On = ENABLED
+        ToolsLight.On = DISABLED
+        OverheadLight.On = DISABLED
+    end
+
+    if destination == 4
+        AutolatheLight.On = DISABLED
+        PipeBenderLight.On = DISABLED
+        ElectronicsLight.On = DISABLED
+        ToolsLight.On = ENABLED
+        OverheadLight.On = DISABLED
+    end
+
+    yield
+j main

@@ -1,0 +1,56 @@
+alias Autolathe d0
+alias PipeBender d1
+alias Electronics d2
+alias Tools d3
+alias Silo d4
+alias Destination d5
+
+const ENABLED = 1
+const DISABLED = 0
+
+Silo.Open = DISABLED
+
+main:
+    var destination = Destination.Setting
+    if destination == 0
+        Silo.Open = DISABLED
+        Autolathe.Open = ENABLED
+        PipeBender.Open = ENABLED
+        Electronics.Open = ENABLED
+        Tools.Open = ENABLED
+    end
+
+    if destination == 1
+        Silo.Open = ENABLED
+        Autolathe.Open = DISABLED
+        PipeBender.Open = ENABLED
+        Electronics.Open = ENABLED
+        Tools.Open = ENABLED
+    end
+
+    if destination == 2
+        Silo.Open = ENABLED
+        Autolathe.Open = ENABLED
+        PipeBender.Open = DISABLED
+        Electronics.Open = ENABLED
+        Tools.Open = ENABLED
+    end
+
+    if destination == 3
+        Silo.Open = ENABLED
+        Autolathe.Open = ENABLED
+        PipeBender.Open = ENABLED
+        Electronics.Open = DISABLED
+        Tools.Open = ENABLED
+    end
+
+    if destination == 4
+        Silo.Open = ENABLED
+        Autolathe.Open = ENABLED
+        PipeBender.Open = ENABLED
+        Electronics.Open = ENABLED
+        Tools.Open = DISABLED
+    end
+
+    yield
+j main

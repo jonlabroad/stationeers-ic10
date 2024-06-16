@@ -1,0 +1,45 @@
+s d4 Open 0
+main:
+l r0 d5 Setting
+seqz r15 r0
+beqz r15 if0exit
+s d4 Open 0
+s d0 Open 1
+s d1 Open 1
+s d2 Open 1
+s d3 Open 1
+if0exit:
+seq r15 r0 1
+beqz r15 if1exit
+s d4 Open 1
+s d0 Open 0
+s d1 Open 1
+s d2 Open 1
+s d3 Open 1
+if1exit:
+seq r15 r0 2
+beqz r15 if2exit
+s d4 Open 1
+s d0 Open 1
+s d1 Open 0
+s d2 Open 1
+s d3 Open 1
+if2exit:
+seq r15 r0 3
+beqz r15 if3exit
+s d4 Open 1
+s d0 Open 1
+s d1 Open 1
+s d2 Open 0
+s d3 Open 1
+if3exit:
+seq r15 r0 4
+beqz r15 if4exit
+s d4 Open 1
+s d0 Open 1
+s d1 Open 1
+s d2 Open 1
+s d3 Open 0
+if4exit:
+yield
+j main
