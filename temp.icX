@@ -1,0 +1,13 @@
+var prevState = 0
+var currState = d1.Setting
+if prevState != currState
+    if currState == 1
+        # load into mem
+        d4.Setting = 2
+        d5.Setting = 5
+    else
+        # clear mem
+        d5.Setting = 0
+    end
+end
+prevState = currState

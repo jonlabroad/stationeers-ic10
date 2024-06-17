@@ -1,0 +1,55 @@
+alias IndexSelectDial d0
+alias NumRequestDial d1
+alias NumRequestDisplay d2
+alias ActivateSwitch d3
+alias RequestSiloIdMem d4
+alias RequestSiloNumRemaining d5
+
+alias selectedIndex r0
+alias selectedHash r1
+alias selectedNum r2
+alias prevSwitchState r3
+alias currSwitchState r4
+
+push HASH("ItemIronOre")
+push HASH("ItemCoalOre")
+push HASH("ItemCopperOre")
+push HASH("ItemGoldOre")
+push HASH("ItemSiliconOre")
+push HASH("ItemSilverOre")
+push HASH("ItemNickelOre")
+push HASH("ItemLeadOre")
+push HASH("ItemCobaltOre")
+push HASH("ItemUraniumOre")
+push HASH("ItemOxite")
+
+s RequestSiloIdMem Setting -1
+s RequestSiloNumRemaining Setting 0
+move prevSwitchState 0
+
+main:
+l selectedIndex IndexSelectDial Setting
+get selectedHash db selectedIndex
+s db Setting selectedHash
+
+l selectedNum NumRequestDial Setting
+s NumRequestDisplay Setting selectedNum
+
+# Detect trigger
+l currSwitchState ActivateSwitch Open
+sne r15 prevSwitchState currSwitchState
+beqz r15 if0exit
+seq r14 currSwitchState 1
+beqz r14 if1else
+    s RequestSiloIdMem Setting selectedIndex
+    s RequestSiloNumRemaining Setting selectedNum
+j if1exit
+if1else:
+    s RequestSiloIdMem Setting -1
+    s RequestSiloNumRemaining Setting 0
+if1exit:
+if0exit:
+move prevSwitchState currSwitchState
+
+yield
+j main

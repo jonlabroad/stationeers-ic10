@@ -1,0 +1,14 @@
+move r0 0
+l r1 d1 Setting
+sne r15 r0 r1
+beqz r15 if0exit
+seq r14 r1 1
+beqz r14 if1else
+s d4 Setting 2
+s d5 Setting 5
+j if1exit
+if1else:
+s d5 Setting 0
+if1exit:
+if0exit:
+move r0 r1

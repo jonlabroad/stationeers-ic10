@@ -1,0 +1,14 @@
+s d1 On 1
+s d2 On 1
+main:
+l r0 d1 Pressure
+sgt r15 r0 5000
+beqz r15 if0else
+s d2 On 0
+j if0exit
+if0else:
+s d2 On 1
+s d2 Setting 33.333
+if0exit:
+yield
+j main

@@ -1,0 +1,75 @@
+s d2 On 1
+s d2 Open 0
+s d2 ClearMemory 1
+s d3 On 1
+s d3 Open 0
+s d3 ClearMemory 1
+s d4 On 1
+s d4 Open 0
+s d4 ClearMemory 1
+s d5 On 1
+s d5 Open 0
+s d5 ClearMemory 1
+move r0 0
+main:
+l r1 d0 Setting
+l r2 d1 Setting
+s db Setting r0
+sgez r15 r1
+sle r14 r1 3
+and r13 r15 r14
+beqz r13 if0else
+slt r12 r0 r2
+beqz r12 if1else
+seq r11 r1 0
+beqz r11 if2exit
+s d2 Open 1
+l r0 d2 ExportCount
+add r0 r0 1
+if2exit:
+seq r11 r1 1
+beqz r11 if3exit
+s d3 Open 1
+l r0 d3 ExportCount
+add r0 r0 1
+if3exit:
+seq r11 r1 2
+beqz r11 if4exit
+s d4 Open 1
+l r0 d4 ExportCount
+add r0 r0 1
+if4exit:
+seq r11 r1 3
+beqz r11 if5exit
+s d5 Open 1
+l r0 d5 ExportCount
+add r0 r0 1
+if5exit:
+j if1exit
+if1else:
+move r0 0
+s d1 Setting 0
+s d0 Setting 0
+s d2 Open 0
+s d2 ClearMemory 1
+s d3 Open 0
+s d3 ClearMemory 1
+s d4 Open 0
+s d4 ClearMemory 1
+s d5 Open 0
+s d5 ClearMemory 1
+if1exit:
+j if0exit
+if0else:
+move r0 0
+s d2 Open 0
+s d2 ClearMemory 1
+s d3 Open 0
+s d3 ClearMemory 1
+s d4 Open 0
+s d4 ClearMemory 1
+s d5 Open 0
+s d5 ClearMemory 1
+if0exit:
+yield
+j main

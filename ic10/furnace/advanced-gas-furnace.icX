@@ -7,12 +7,21 @@ alias PressureDisplay d4
 const pressureInVol = 10 #L
 const pressureOutVol = 10 #L
 
-const targetPressureLow = 900 #kPa
-const targetPressureHigh = 2300 #kPa
-const targetFurnacePressure = 1500 #kPa
-const targetTempLow = 700 #K
-const targetTempHigh = 9000 #K
-const targetFurnaceTemp = 2000 #K
+# Solder - 1:1: Iron:Lead
+#const targetPressureLow = 2000 #kPa
+#const targetPressureHigh = 6000 #kPa
+#const targetFurnacePressure = 4000 #kPa
+#const targetTempLow = 400 #K
+#const targetTempHigh = 500 #K
+#const targetFurnaceTemp = 450 #K
+
+# Basic ingots
+const targetPressureLow = 2000 #kPa
+const targetPressureHigh = 6000 #kPa
+const targetFurnacePressure = 4000 #kPa
+const targetTempLow = 900 #K
+const targetTempHigh = 1400 #K
+const targetFurnaceTemp = 1200 #K
 
 const volOxyShutoffPressure = 5000 #kPa
 const volMixPercentage = 33.333 #66.67

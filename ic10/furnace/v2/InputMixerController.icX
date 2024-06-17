@@ -1,0 +1,21 @@
+alias InputAnalyzer d1
+alias VolOxyMixer d2
+
+const volOxyShutoffPressure = 5000 #kPa
+const volMixPercentage = 33.333 #66.67
+
+InputAnalyzer.On = 1
+VolOxyMixer.On = 1
+
+main:
+    # Input Mixer
+    var inputGasPressure = InputAnalyzer.Pressure
+    if inputGasPressure > volOxyShutoffPressure
+        VolOxyMixer.On = 0
+    else
+        VolOxyMixer.On = 1
+        VolOxyMixer.Setting = volMixPercentage
+    end
+
+    yield
+j main

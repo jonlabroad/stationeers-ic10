@@ -1,0 +1,45 @@
+s d0 On 1
+s d0 SettingInput 0
+s d0 SettingOutput 0
+main:
+l r0 d1 Setting
+l r1 d2 Setting
+sub r15 r1 r0
+div r15 r15 2
+add r2 r15 r0
+l r3 d3 Setting
+l r4 d4 Setting
+sub r15 r4 r3
+div r15 r15 2
+add r5 r15 r3
+l r6 d0 Pressure
+move r7 0
+slt r15 r6 r0
+beqz r15 if0exit
+move r7 10
+s d0 SettingOutput 0
+if0exit:
+sgt r15 r6 r0
+slt r14 r6 r1
+and r13 r15 r14
+beqz r13 if1exit
+s d0 SettingOutput 0
+if1exit:
+sgt r15 r6 r1
+beqz r15 if2exit
+s d0 SettingOutput 10
+if2exit:
+l r8 d0 Temperature
+slt r15 r8 r5
+beqz r15 if3exit
+move r7 10
+if3exit:
+sgt r15 r8 r3
+slt r14 r8 r4
+and r13 r15 r14
+beqz r13 if4exit
+move r7 0
+if4exit:
+s d0 SettingInput r7
+yield
+j main

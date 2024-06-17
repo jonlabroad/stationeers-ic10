@@ -1,0 +1,53 @@
+alias Furnace d0
+alias PressureMin d1
+alias PressureMax d2
+alias TempMin d3
+alias TempMax d4
+
+const pressureInVol = 10 #L
+const pressureOutVol = 10 #L
+
+Furnace.On = 1
+
+Furnace.SettingInput = 0
+Furnace.SettingOutput = 0
+
+main:
+    var targetPressureLow = PressureMin.Setting
+    var targetPressureHigh = PressureMax.Setting
+    var targetFurnacePressure = (targetPressureHigh - targetPressureLow) / 2 + targetPressureLow
+    var targetTempLow = TempMin.Setting
+    var targetTempHigh = TempMax.Setting
+    var targetFurnaceTemp = (targetTempHigh - targetTempLow) / 2 + targetTempLow
+
+    var currentPressure = Furnace.Pressure
+
+    var settingInput = 0
+    if currentPressure < targetPressureLow
+        # Still need more pressure, need input
+        settingInput = pressureInVol
+        Furnace.SettingOutput = 0
+    end
+    if currentPressure > targetPressureLow && currentPressure < targetPressureHigh
+        # Pressure target reached, no output req
+        Furnace.SettingOutput = 0
+    end
+    if currentPressure > targetPressureHigh
+        # Pressure too high
+        Furnace.SettingOutput = pressureOutVol
+    end
+
+    var currentTemp = Furnace.Temperature
+    if currentTemp < targetFurnaceTemp
+        settingInput = pressureInVol
+    end
+    if currentTemp > targetTempLow && currentTemp < targetTempHigh
+        # Temp target reached
+        # TODO: Don't necessarily want to shut it off if we still need pressure
+        settingInput = 0
+    end
+
+    Furnace.SettingInput = settingInput
+
+    yield
+j main
