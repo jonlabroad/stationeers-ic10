@@ -1,0 +1,25 @@
+s d0 ClearMemory 1
+move r0 0
+main:
+move r1 r0
+s db Setting r0
+l r2 d0 Reagents
+seq r15 r0 0
+beqz r15 if0exit
+s d0 Open 0
+sge r14 r2 100
+beqz r14 if1exit
+move r1 1
+if1exit:
+if0exit:
+seq r15 r0 1
+beqz r15 if2exit
+s d0 Open 1
+slez r14 r2
+beqz r14 if3exit
+move r1 0
+if3exit:
+if2exit:
+move r0 r1
+yield
+j main

@@ -1,0 +1,32 @@
+alias Centrifuge d0
+
+const ENABLED = 1
+const DISABLED = 0
+
+const STATE_ON = 0
+const STATE_OPEN = 1
+
+const maxReagents = 100
+
+Centrifuge.ClearMemory = 1
+var currentState = STATE_ON
+main:
+    var nextState = currentState
+    db.Setting = currentState
+    
+    var numReagents = Centrifuge.Reagents
+    if currentState == STATE_ON
+        Centrifuge.Open = 0
+        if numReagents >= maxReagents
+            nextState = STATE_OPEN
+        end
+    end
+    if currentState == STATE_OPEN
+        Centrifuge.Open = 1
+        if numReagents <= 0
+            nextState = STATE_ON
+        end
+    end
+    currentState = nextState
+    yield
+j main

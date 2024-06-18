@@ -1,0 +1,86 @@
+alias SiloIdMem d0
+alias SiloNumMem d1
+alias Silo0 d2
+alias Silo1 d3
+alias Silo2 d4
+alias Silo3 d5
+alias SelectedSilo d2
+
+const SILO0 = 4
+const SILO1 = 5
+const SILO2 = 6
+const SILO3 = 7
+
+Silo0.On = 1
+Silo0.Open = 0
+Silo0.ClearMemory = 1
+
+Silo1.On = 1
+Silo1.Open = 0
+Silo1.ClearMemory = 1
+
+Silo2.On = 1
+Silo2.Open = 0
+Silo2.ClearMemory = 1
+
+Silo3.On = 1
+Silo3.Open = 0
+Silo3.ClearMemory = 1
+
+var numSent = 0
+
+main:
+    var siloId = SiloIdMem.Setting
+    var numToSend = SiloNumMem.Setting
+    db.Setting = numSent
+
+    if siloId >= SILO0 && siloId <= SILO3
+        if numSent < numToSend
+            if siloId == SILO0
+                Silo0.Open = 1
+                numSent = Silo0.ExportCount
+                numSent++
+            end
+            if siloId == SILO1
+                Silo1.Open = 1
+                numSent = Silo1.ExportCount
+                numSent++
+            end
+            if siloId == SILO2
+                Silo2.Open = 1
+                numSent = Silo2.ExportCount
+                numSent++
+            end
+            if siloId == SILO3
+                Silo3.Open = 1
+                numSent = Silo3.ExportCount
+                numSent++
+            end
+        else
+            # We are done
+            numSent = 0
+            SiloNumMem.Setting = 0
+            SiloIdMem.Setting = 0
+            Silo0.Open = 0
+            Silo0.ClearMemory = 1
+            Silo1.Open = 0
+            Silo1.ClearMemory = 1
+            Silo2.Open = 0
+            Silo2.ClearMemory = 1
+            Silo3.Open = 0
+            Silo3.ClearMemory = 1
+        end
+    else
+        numSent = 0
+        Silo0.Open = 0
+        Silo0.ClearMemory = 1
+        Silo1.Open = 0
+        Silo1.ClearMemory = 1
+        Silo2.Open = 0
+        Silo2.ClearMemory = 1
+        Silo3.Open = 0
+        Silo3.ClearMemory = 1
+    end
+
+    yield
+j main
