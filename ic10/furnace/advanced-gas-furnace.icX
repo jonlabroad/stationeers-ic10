@@ -23,6 +23,14 @@ const targetTempLow = 900 #K
 const targetTempHigh = 1400 #K
 const targetFurnaceTemp = 1200 #K
 
+# Constantan
+#const targetPressureLow = 30000 #kPa
+#const targetPressureHigh = 50000 #kPa
+#const targetFurnacePressure = 40000 #kPa
+#const targetTempLow = 2000 #K
+#const targetTempHigh = 9000 #K
+#const targetFurnaceTemp = 5000 #K
+
 const volOxyShutoffPressure = 5000 #kPa
 const volMixPercentage = 33.333 #66.67
 
