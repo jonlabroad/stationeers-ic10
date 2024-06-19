@@ -1,0 +1,24 @@
+alias VolumePump d0
+alias Analyzer d1
+alias Regulator d2
+
+const shutoffPressure = 10000 #kPa
+
+VolumePump.On = 1
+VolumePump.Setting = 5.0
+Analyzer.On = 1
+Regulator.On = 1
+
+var enable = 1
+main:
+    var pipePressure = Analyzer.Pressure
+    if pipePressure > shutoffPressure
+        enable = 0
+    else
+        enable = 1
+    end
+    
+    VolumePump.On = enable
+
+    yield
+j main
