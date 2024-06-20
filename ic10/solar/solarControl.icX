@@ -17,10 +17,6 @@ main:
     end
     lastReading = verticalReading
 
-    setSolarPanels()
+    d(SOLAR_HASH).Vertical = vertical
     yield
 j main
-
-function setSolarPanels
-    d(SOLAR_HASH).Vertical = vertical
-end

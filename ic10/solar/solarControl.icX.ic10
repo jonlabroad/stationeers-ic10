@@ -14,10 +14,6 @@ add r1 90 r3
 if1exit:
 if0exit:
 move r2 r3
-jal setSolarPanels
+sb r0 Vertical r1
 yield
 j main
-jr 4
-setSolarPanels:
-sb r0 Vertical r1
-j ra
