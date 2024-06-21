@@ -16,12 +16,12 @@ const pressureOutVol = 10 #L
 #const targetFurnaceTemp = 450 #K
 
 # Basic ingots
-const targetPressureLow = 2000 #kPa
-const targetPressureHigh = 6000 #kPa
-const targetFurnacePressure = 4000 #kPa
-const targetTempLow = 900 #K
-const targetTempHigh = 1400 #K
-const targetFurnaceTemp = 1200 #K
+#const targetPressureLow = 2000 #kPa
+#const targetPressureHigh = 6000 #kPa
+#const targetFurnacePressure = 4000 #kPa
+#const targetTempLow = 900 #K
+#const targetTempHigh = 1400 #K
+#const targetFurnaceTemp = 1200 #K
 
 # Constantan
 #const targetPressureLow = 30000 #kPa
@@ -30,6 +30,14 @@ const targetFurnaceTemp = 1200 #K
 #const targetTempLow = 2000 #K
 #const targetTempHigh = 9000 #K
 #const targetFurnaceTemp = 5000 #K
+
+# Electrum
+const targetPressureLow = 900 #kPa
+const targetPressureHigh = 2300 #kPa
+const targetFurnacePressure = 1800 #kPa
+const targetTempLow = 600 #K
+const targetTempHigh = 10000 #K
+const targetFurnaceTemp = 700 #K
 
 const volOxyShutoffPressure = 5000 #kPa
 const volMixPercentage = 33.333 #66.67

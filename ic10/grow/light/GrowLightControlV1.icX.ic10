@@ -1,0 +1,14 @@
+l r0 d1 PrefabHash
+main:
+l r1 d0 Vertical
+sgt r15 r1 90
+slt r14 r1 135
+and r13 r15 r14
+beqz r13 if0else
+sb r0 On 1
+j if0exit
+if0else:
+sb r0 On 0
+if0exit:
+yield
+j main

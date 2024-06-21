@@ -1,8 +1,9 @@
 alias GasMixer d0
-alias Analyzer d1
+alias CoolantAnalyzer d1
 alias VolPump d2
 alias ZoneSensor d3
 alias StatusLed d4
+alias CoolantHeater d5
 
 const ENABLE = 1
 const DISABLE = 0
@@ -13,10 +14,15 @@ const triggerPressureHigh = 90 #kPa
 
 const constantMixRatio = 33 # Percent
 
+const minCoolantTemp = 280 # Kelvin
+const heatToCoolantTemp = 330 # Kelvin
+
 var enablePump = DISABLE
+var coolantHeaterEnable = DISABLE
 
 GasMixer.Setting = constantMixRatio
 VolPump.Setting = 10
+CoolantAnalyzer.On = ENABLE
 
 main:
     var zonePressure = ZoneSensor.Pressure
@@ -29,7 +35,6 @@ main:
     end
 
     GasMixer.On = enablePump
-    Analyzer.On = enablePump
     VolPump.On = enablePump
     
     db.Setting = zonePressure
@@ -41,6 +46,19 @@ main:
         StatusLed.Color = 5
     end
     StatusLed.On = enablePump
+
+    # Coolant temperature check, don't want the pipes to burst if
+    # AC is idle too long
+    var coolantTemperature = CoolantAnalyzer.Temperature
+
+    if coolantTemperature < minCoolantTemp
+        coolantHeaterEnable = ENABLE
+    end
+
+    if coolantHeaterEnable == ENABLE && coolantTemperature > heatToCoolantTemp
+        coolantHeaterEnable = DISABLE
+    end
+    CoolantHeater.On = coolantHeaterEnable
 
     yield
 j main
