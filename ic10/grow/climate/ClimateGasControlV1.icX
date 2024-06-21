@@ -1,0 +1,46 @@
+alias GasMixer d0
+alias Analyzer d1
+alias VolPump d2
+alias ZoneSensor d3
+alias StatusLed d4
+
+const ENABLE = 1
+const DISABLE = 0
+
+const targetPressure = 75 #kPa
+const triggerPressureLow = 60 #kPa
+const triggerPressureHigh = 90 #kPa
+
+const constantMixRatio = 33 # Percent
+
+var enablePump = DISABLE
+
+GasMixer.Setting = constantMixRatio
+VolPump.Setting = 10
+
+main:
+    var zonePressure = ZoneSensor.Pressure
+    if zonePressure < triggerPressureLow
+        enablePump = ENABLE
+    end
+
+    if enablePump == ENABLE && zonePressure > targetPressure
+        enablePump = DISABLE
+    end
+
+    GasMixer.On = enablePump
+    Analyzer.On = enablePump
+    VolPump.On = enablePump
+    
+    db.Setting = zonePressure
+
+    if zonePressure < targetPressure
+        StatusLed.Color = 0
+    end
+    if zonePressure > targetPressure
+        StatusLed.Color = 5
+    end
+    StatusLed.On = enablePump
+
+    yield
+j main

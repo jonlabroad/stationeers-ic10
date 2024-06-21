@@ -1,0 +1,30 @@
+move r0 0
+s d0 Setting 33
+s d2 Setting 10
+main:
+l r1 d3 Pressure
+slt r15 r1 60
+beqz r15 if0exit
+move r0 1
+if0exit:
+seq r15 r0 1
+sgt r14 r1 75
+and r13 r15 r14
+beqz r13 if1exit
+move r0 0
+if1exit:
+s d0 On r0
+s d1 On r0
+s d2 On r0
+s db Setting r1
+slt r15 r1 75
+beqz r15 if2exit
+s d4 Color 0
+if2exit:
+sgt r15 r1 75
+beqz r15 if3exit
+s d4 Color 5
+if3exit:
+s d4 On r0
+yield
+j main
