@@ -1,0 +1,21 @@
+alias MedSat d0
+alias AzDial d1
+alias ElDial d2
+alias Display0 d3
+
+const DISABLE = 0
+const ENABLE = 1
+
+MedSat.On = ENABLE
+
+main:
+    var azSetting = AzDial.Setting
+    var elSetting = ElDial.Setting
+    MedSat.Horizontal = azSetting
+    MedSat.Vertical = elSetting
+    
+    var progress = MedSat.InterrogationProgress
+    Display0.Setting = progress
+
+    yield
+j main

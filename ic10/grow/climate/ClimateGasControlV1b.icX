@@ -1,0 +1,23 @@
+# Part 2 of climate control
+# Overpressurization protection
+
+alias ActiveVent d0
+alias GasSensor d1
+
+const MAX_PRESSURE = 90
+
+const INWARD = 1
+
+ActiveVent.On = 0
+ActiveVent.Mode = INWARD
+
+main:
+    var pressure = GasSensor.Pressure
+    if pressure > MAX_PRESSURE
+        ActiveVent.On = 1
+    else
+        ActiveVent.On = 0
+    end
+
+    yield
+j main

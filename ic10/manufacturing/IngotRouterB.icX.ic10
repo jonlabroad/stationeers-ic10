@@ -1,0 +1,13 @@
+s d0 On 1
+main:
+l r0 d5 Setting
+seq r15 r0 6
+beqz r15 if0exit
+s d0 Mode 1
+if0exit:
+slt r15 r0 6
+beqz r15 if1exit
+s d0 Mode 0
+if1exit:
+yield
+j main

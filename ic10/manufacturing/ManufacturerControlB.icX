@@ -1,0 +1,16 @@
+alias Rocket d0
+alias Destination d5
+
+const ENABLED = 1
+const DISABLED = 0
+
+main:
+    var destination = Destination.Setting
+    if destination == 6
+        Rocket.Open = DISABLED
+    else
+        Rocket.Open = ENABLED
+    end
+
+    yield
+j main

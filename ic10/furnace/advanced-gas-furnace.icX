@@ -3,41 +3,10 @@ alias InputAnalyzer d1
 alias VolOxyMixer d2
 alias TempDisplay d3
 alias PressureDisplay d4
+alias IngotHashMem d5
 
 const pressureInVol = 10 #L
 const pressureOutVol = 10 #L
-
-# Solder - 1:1: Iron:Lead
-#const targetPressureLow = 2000 #kPa
-#const targetPressureHigh = 6000 #kPa
-#const targetFurnacePressure = 4000 #kPa
-#const targetTempLow = 400 #K
-#const targetTempHigh = 500 #K
-#const targetFurnaceTemp = 450 #K
-
-# Basic ingots
-#const targetPressureLow = 2000 #kPa
-#const targetPressureHigh = 6000 #kPa
-#const targetFurnacePressure = 4000 #kPa
-#const targetTempLow = 900 #K
-#const targetTempHigh = 1400 #K
-#const targetFurnaceTemp = 1200 #K
-
-# Constantan
-#const targetPressureLow = 30000 #kPa
-#const targetPressureHigh = 50000 #kPa
-#const targetFurnacePressure = 40000 #kPa
-#const targetTempLow = 2000 #K
-#const targetTempHigh = 9000 #K
-#const targetFurnaceTemp = 5000 #K
-
-# Electrum
-const targetPressureLow = 900 #kPa
-const targetPressureHigh = 2300 #kPa
-const targetFurnacePressure = 1800 #kPa
-const targetTempLow = 600 #K
-const targetTempHigh = 10000 #K
-const targetFurnaceTemp = 700 #K
 
 const volOxyShutoffPressure = 5000 #kPa
 const volMixPercentage = 33.333 #66.67
@@ -50,6 +19,71 @@ Furnace.SettingInput = 0
 Furnace.SettingOutput = 0
 
 main:
+    var selectedHash = IngotHashMem.Setting
+    
+    # Basic ingots
+    var targetPressureLow = 2000 #kPa
+    var targetPressureHigh = 6000 #kPa
+    #var targetFurnacePressure = 4000 #kPa
+    var targetTempLow = 1100 #K
+    var targetTempHigh = 1400 #K
+    var targetFurnaceTemp = 1200 #K
+
+    if selectedHash == 1
+        # Solder - 1:1: Iron:Lead
+        targetPressureLow = 2000 #kPa
+        targetPressureHigh = 6000 #kPa
+        #targetFurnacePressure = 4000 #kPa
+        targetTempLow = 400 #K
+        targetTempHigh = 500 #K
+        targetFurnaceTemp = 450 #K
+    end
+    if selectedHash == 2
+        # Constantan
+        targetPressureLow = 30000 #kPa
+        targetPressureHigh = 50000 #kPa
+        #targetFurnacePressure = 40000 #kPa
+        targetTempLow = 2000 #K
+        targetTempHigh = 9000 #K
+        targetFurnaceTemp = 5000 #K
+    end
+    if selectedHash == 3
+        # Electrum
+        targetPressureLow = 900 #kPa
+        targetPressureHigh = 2300 #kPa
+        #targetFurnacePressure = 1800 #kPa
+        targetTempLow = 600 #K
+        targetTempHigh = 10000 #K
+        targetFurnaceTemp = 700 #K
+    end
+    if selectedHash == 4
+        # Astroloy
+        targetPressureLow = 30200 #kPa
+        targetPressureHigh = 38000 #kPa
+        #targetFurnacePressure = 31000 #kPa
+        targetTempLow = 6000 #K
+        targetTempHigh = 100000 #K
+        targetFurnaceTemp = 8000 #K
+    end
+    if selectedHash == 5
+        # Stellite
+        targetPressureLow = 10000 #kPa
+        targetPressureHigh = 20000 #kPa
+        #targetFurnacePressure = 15000 #kPa
+        targetTempLow = 2000 #K
+        targetTempHigh = 100000 #K
+        targetFurnaceTemp = 8000 #K
+    end
+    if selectedHash == 6
+        # Waspaloy
+        targetPressureLow = 55000 #kPa
+        targetPressureHigh = 60000 #kPa
+        #targetFurnacePressure = 15000 #kPa
+        targetTempLow = 400 #K
+        targetTempHigh = 800 #K
+        targetFurnaceTemp = 700 #K
+    end
+
     # Input Mixer
     var inputGasPressure = InputAnalyzer.Pressure
     if inputGasPressure > volOxyShutoffPressure
@@ -92,7 +126,9 @@ main:
         tempDisplayColor = 2
         # Temp target reached
         # TODO: Don't necessarily want to shut it off if we still need pressure
-        settingInput = 0
+        if currentPressure > targetPressureLow
+            settingInput = 0
+        end
     end
     if currentTemp > targetPressureHigh
         tempDisplayColor = 4

@@ -65,5 +65,13 @@ main:
         PurgeRouter.Mode = ENABLED 
     end
 
+    if destination > 5
+        AutolatheRouter.Mode = DISABLED
+        PipeBenderRouter.Mode = DISABLED
+        ElectronicsRouter.Mode = DISABLED
+        ToolsRouter.Mode = DISABLED
+        PurgeRouter.Mode = DISABLED
+    end
+
     yield
 j main

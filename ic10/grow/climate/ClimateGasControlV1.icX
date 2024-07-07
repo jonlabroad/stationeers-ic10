@@ -14,8 +14,8 @@ const triggerPressureHigh = 90 #kPa
 
 const constantMixRatio = 33 # Percent
 
-const minCoolantTemp = 280 # Kelvin
-const heatToCoolantTemp = 330 # Kelvin
+const minCoolantTemp = 270 # Kelvin
+const heatToCoolantTemp = 290 # Kelvin
 
 var enablePump = DISABLE
 var coolantHeaterEnable = DISABLE

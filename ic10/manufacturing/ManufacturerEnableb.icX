@@ -1,0 +1,18 @@
+alias RocketSwitch d0
+alias Destination d5
+
+const ENABLED = 1
+const DISABLED = 0
+
+RocketSwitch.Open = DISABLED
+
+main:
+    var rocketEnable = RocketSwitch.Open
+    if rocketEnable == ENABLED
+        Destination.Setting = 6
+        RocketSwitch.Open = ENABLED
+        j main
+    end
+
+    yield
+j main

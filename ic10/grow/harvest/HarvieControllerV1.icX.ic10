@@ -1,0 +1,55 @@
+s d1 On 1
+s d3 On 1
+main:
+l r0 d1 Activate
+seqz r15 r0
+beqz r15 if0exit
+ls r1 d0 0 Occupied
+seqz r14 r1
+beqz r14 if1else
+ls r2 d1 0 Occupied
+seq r13 r2 1
+beqz r13 if2exit
+s d1 Plant 1
+sleep 10
+if2exit:
+j if1exit
+if1else:
+ls r3 d0 0 Mature
+ls r4 d0 0 Seeding
+seq r13 r3 1
+snez r12 r4
+and r11 r13 r12
+beqz r11 if3exit
+s d1 Harvest 1
+sleep 10
+if3exit:
+if1exit:
+if0exit:
+l r5 d3 Activate
+seqz r15 r5
+beqz r15 if4exit
+ls r6 d2 0 Occupied
+seqz r14 r6
+beqz r14 if5else
+ls r7 d3 0 Occupied
+seq r13 r7 1
+beqz r13 if6exit
+s d3 Plant 1
+sleep 10
+if6exit:
+j if5exit
+if5else:
+ls r8 d2 0 Mature
+ls r9 d2 0 Seeding
+seq r13 r8 1
+snez r12 r9
+and r11 r13 r12
+beqz r11 if7exit
+s d3 Harvest 1
+sleep 10
+if7exit:
+if5exit:
+if4exit:
+yield
+j main

@@ -45,5 +45,13 @@ s d2 On 0
 s d3 On 1
 s d4 On 0
 if4exit:
+seq r15 r0 5
+beqz r15 if5exit
+s d0 On 0
+s d1 On 0
+s d2 On 0
+s d3 On 0
+s d4 On 0
+if5exit:
 yield
 j main

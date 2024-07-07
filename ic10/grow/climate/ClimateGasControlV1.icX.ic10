@@ -28,12 +28,12 @@ s d4 Color 5
 if3exit:
 s d4 On r0
 l r3 d1 Temperature
-slt r15 r3 280
+slt r15 r3 270
 beqz r15 if4exit
 move r1 1
 if4exit:
 seq r15 r1 1
-sgt r14 r3 330
+sgt r14 r3 290
 and r13 r15 r14
 beqz r13 if5exit
 move r1 0

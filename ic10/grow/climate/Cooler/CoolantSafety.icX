@@ -1,0 +1,30 @@
+alias CoolantAnalyzer d0
+alias CoolantHeater d1
+
+const ENABLE = 1
+const DISABLE = 0
+
+const minCoolantTemp = 250 # Kelvin
+const heatToCoolantTemp = 275 # Kelvin
+
+var coolantHeaterEnable = DISABLE
+
+CoolantAnalyzer.On = ENABLE
+
+main:
+    # Coolant temperature check, don't want the pipes to burst if
+    # AC is idle too long
+    var coolantTemperature = CoolantAnalyzer.Temperature
+
+    if coolantTemperature < minCoolantTemp
+        coolantHeaterEnable = ENABLE
+    end
+
+    if coolantHeaterEnable == ENABLE && coolantTemperature > heatToCoolantTemp
+        coolantHeaterEnable = DISABLE
+    end
+    CoolantHeater.On = coolantHeaterEnable
+    db.Setting = coolantTemperature
+
+    yield
+j main

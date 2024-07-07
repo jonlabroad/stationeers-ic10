@@ -4,56 +4,113 @@ s d2 On 1
 s d0 SettingInput 0
 s d0 SettingOutput 0
 main:
-l r0 d1 Pressure
-sgt r15 r0 5000
-beqz r15 if0else
+l r0 d5 Setting
+move r1 2000
+move r2 6000
+move r3 1100
+move r4 1400
+move r5 1200
+seq r15 r0 1
+beqz r15 if0exit
+move r1 2000
+move r2 6000
+move r3 400
+move r4 500
+move r5 450
+if0exit:
+seq r15 r0 2
+beqz r15 if1exit
+move r1 30000
+move r2 50000
+move r3 2000
+move r4 9000
+move r5 5000
+if1exit:
+seq r15 r0 3
+beqz r15 if2exit
+move r1 900
+move r2 2300
+move r3 600
+move r4 10000
+move r5 700
+if2exit:
+seq r15 r0 4
+beqz r15 if3exit
+move r1 30200
+move r2 38000
+move r3 6000
+move r4 100000
+move r5 8000
+if3exit:
+seq r15 r0 5
+beqz r15 if4exit
+move r1 10000
+move r2 20000
+move r3 2000
+move r4 100000
+move r5 8000
+if4exit:
+seq r15 r0 6
+beqz r15 if5exit
+move r1 55000
+move r2 60000
+move r3 400
+move r4 800
+move r5 700
+if5exit:
+l r6 d1 Pressure
+sgt r15 r6 5000
+beqz r15 if6else
 s d2 On 0
-j if0exit
-if0else:
+j if6exit
+if6else:
 s d2 On 1
 s d2 Setting 33.333
-if0exit:
-l r1 d0 Pressure
-move r2 0
-move r3 0
-slt r15 r1 900
-beqz r15 if1exit
-move r3 0
-move r2 10
-s d0 SettingOutput 0
-if1exit:
-sgt r15 r1 900
-slt r14 r1 2300
-and r13 r15 r14
-beqz r13 if2exit
-move r3 2
-s d0 SettingOutput 0
-if2exit:
-sgt r15 r1 2300
-beqz r15 if3exit
-move r3 4
-s d0 SettingOutput 10
-if3exit:
-s d4 Color r3
-l r4 d0 Temperature
-move r5 0
-slt r15 r4 700
-beqz r15 if4exit
-move r5 0
-move r2 10
-if4exit:
-sgt r15 r4 600
-slt r14 r4 10000
-and r13 r15 r14
-beqz r13 if5exit
-move r5 2
-move r2 0
-if5exit:
-sgt r15 r4 2300
-beqz r15 if6exit
-move r5 4
 if6exit:
-s d3 Color r5
-s d0 SettingInput r2
+l r7 d0 Pressure
+move r8 0
+move r9 0
+slt r15 r7 r1
+beqz r15 if7exit
+move r9 0
+move r8 10
+s d0 SettingOutput 0
+if7exit:
+sgt r15 r7 r1
+slt r14 r7 r2
+and r13 r15 r14
+beqz r13 if8exit
+move r9 2
+s d0 SettingOutput 0
+if8exit:
+sgt r15 r7 r2
+beqz r15 if9exit
+move r9 4
+s d0 SettingOutput 10
+if9exit:
+s d4 Color r9
+l r10 d0 Temperature
+move r11 0
+slt r15 r10 r5
+beqz r15 if10exit
+move r11 0
+move r8 10
+if10exit:
+sgt r15 r10 r3
+slt r14 r10 r4
+and r13 r15 r14
+beqz r13 if11exit
+move r11 2
+sgt r12 r7 r1
+beqz r12 if12exit
+move r8 0
+if12exit:
+if11exit:
+sgt r15 r10 r2
+beqz r15 if13exit
+move r11 4
+if13exit:
+s d3 Color r11
+s d0 SettingInput r8
 yield
 j main

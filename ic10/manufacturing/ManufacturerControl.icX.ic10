@@ -41,5 +41,21 @@ s d1 Open 1
 s d2 Open 1
 s d3 Open 0
 if4exit:
+seq r15 r0 5
+beqz r15 if5exit
+s d4 Open 1
+s d0 Open 1
+s d1 Open 1
+s d2 Open 1
+s d3 Open 1
+if5exit:
+sge r15 r0 6
+beqz r15 if6exit
+s d4 Open 1
+s d0 Open 1
+s d1 Open 1
+s d2 Open 1
+s d3 Open 1
+if6exit:
 yield
 j main

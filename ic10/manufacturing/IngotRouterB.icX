@@ -1,0 +1,20 @@
+alias RocketRouter d0
+alias Destination d5
+
+const ENABLED = 1
+const DISABLED = 0
+
+RocketRouter.On = 1
+
+main:
+    var destination = Destination.Setting
+    if destination == 6
+        RocketRouter.Mode = ENABLED
+    end
+
+    if destination < 6
+        RocketRouter.Mode = DISABLED
+    end
+
+    yield
+j main

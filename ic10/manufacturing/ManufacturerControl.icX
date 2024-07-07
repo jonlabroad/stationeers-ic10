@@ -52,5 +52,21 @@ main:
         Tools.Open = DISABLED
     end
 
+    if destination == 5
+        Silo.Open = ENABLED
+        Autolathe.Open = ENABLED
+        PipeBender.Open = ENABLED
+        Electronics.Open = ENABLED
+        Tools.Open = ENABLED       
+    end
+
+    if destination >= 6
+        Silo.Open = ENABLED
+        Autolathe.Open = ENABLED
+        PipeBender.Open = ENABLED
+        Electronics.Open = ENABLED
+        Tools.Open = ENABLED
+    end
+
     yield
 j main

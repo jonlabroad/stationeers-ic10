@@ -57,5 +57,13 @@ main:
         OverheadLight.On = DISABLED
     end
 
+    if destination == 5
+        AutolatheLight.On = DISABLED
+        PipeBenderLight.On = DISABLED
+        ElectronicsLight.On = DISABLED
+        ToolsLight.On = DISABLED
+        OverheadLight.On = DISABLED
+    end
+
     yield
 j main

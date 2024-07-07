@@ -1,0 +1,10 @@
+s d0 On 1
+main:
+l r0 d1 Setting
+l r1 d2 Setting
+s d0 Horizontal r0
+s d0 Vertical r1
+l r2 d0 InterrogationProgress
+s d3 Setting r2
+yield
+j main

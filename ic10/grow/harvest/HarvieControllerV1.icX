@@ -1,0 +1,58 @@
+alias Hydro0 d0
+alias Harvie0 d1
+alias Hydro1 d2
+alias Harvie1 d3
+
+const ENABLE = 1
+const DISABLE = 0
+const HYDRO_PLANT_SLOT = 0
+const HARVIE_SEED_SLOT = 0
+
+Harvie0.On = ENABLE
+Harvie1.On = ENABLE
+
+main:
+    # If nothing planted and we have seeds, plant!
+    # 	Idle = 0, Planting = 1, Harvesting = 2
+    var harvie0Status = Harvie0.Activate
+    if harvie0Status == 0 #Idle
+        var hydro0Occupied = Hydro0.slot(HYDRO_PLANT_SLOT).Occupied
+        if hydro0Occupied == 0
+            var harvie0Seeds = Harvie0.slot(HARVIE_SEED_SLOT).Occupied
+            if harvie0Seeds == 1
+                Harvie0.Plant = 1
+                sleep 10
+            end
+        else
+            # Is it mature?
+            var isMature0 = Hydro0.slot(HYDRO_PLANT_SLOT).Mature
+            var seeding0 = Hydro0.slot(HYDRO_PLANT_SLOT).Seeding
+            if isMature0 == 1 && seeding0 != 0
+                Harvie0.Harvest = 1
+                sleep 10
+            end
+        end
+    end
+
+    var harvie1Status = Harvie1.Activate
+    if harvie1Status == 0 #Idle
+        var hydro1Occupied = Hydro1.slot(HYDRO_PLANT_SLOT).Occupied
+        if hydro1Occupied == 0
+            var harvie1Seeds = Harvie1.slot(HARVIE_SEED_SLOT).Occupied
+            if harvie1Seeds == 1
+                Harvie1.Plant = 1
+                sleep 10
+            end
+        else
+            # Is it mature?
+            var isMature1 = Hydro1.slot(HYDRO_PLANT_SLOT).Mature
+            var seeding1 = Hydro1.slot(HYDRO_PLANT_SLOT).Seeding
+            if isMature1 == 1 && seeding1 != 0
+                Harvie1.Harvest = 1
+                sleep 10
+            end
+        end
+    end
+
+    yield
+j main

@@ -2,6 +2,7 @@ alias AutolatheSwitch d0
 alias PipeBenderSwitch d1
 alias ElectronicsSwitch d2
 alias ToolsSwitch d3
+alias PurgeSwitch d4
 alias Destination d5
 
 const ENABLED = 1
@@ -9,6 +10,9 @@ const DISABLED = 0
 
 AutolatheSwitch.Open = DISABLED
 PipeBenderSwitch.Open = DISABLED
+ElectronicsSwitch.Open = DISABLED
+ToolsSwitch.Open = DISABLED
+PurgeSwitch.Open = DISABLED
 
 main:
     var autolatheEnable = AutolatheSwitch.Open
@@ -47,8 +51,24 @@ main:
         j main
     end
 
-    # If we fall through to here, it is disabled
-    Destination.Setting = 0
+    var purgeEnable = PurgeSwitch.Open
+    if purgeEnable == ENABLED
+        Destination.Setting = 5
+        AutolatheSwitch.Open = DISABLED
+        PipeBenderSwitch.Open = DISABLED
+        ElectronicsSwitch.Open = DISABLED
+        ToolsSwitch.Open = DISABLED    
+        j main
+    end
+
+    var currSetting = Destination.Setting
+    if currSetting > 5
+        AutolatheSwitch.Open = DISABLED
+        PipeBenderSwitch.Open = DISABLED
+        ElectronicsSwitch.Open = DISABLED
+        ToolsSwitch.Open = DISABLED
+        PurgeSwitch.Open = DISABLED
+    end
 
     yield
 j main

@@ -1,0 +1,11 @@
+main:
+l r0 d5 Setting
+seq r15 r0 6
+beqz r15 if0else
+s d0 Open 0
+j if0exit
+if0else:
+s d0 Open 1
+if0exit:
+yield
+j main

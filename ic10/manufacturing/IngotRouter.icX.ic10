@@ -53,5 +53,13 @@ s d2 Mode 0
 s d3 Mode 0
 s d4 Mode 1
 if5exit:
+sgt r15 r0 5
+beqz r15 if6exit
+s d0 Mode 0
+s d1 Mode 0
+s d2 Mode 0
+s d3 Mode 0
+s d4 Mode 0
+if6exit:
 yield
 j main

@@ -1,5 +1,8 @@
 s d0 Open 0
 s d1 Open 0
+s d2 Open 0
+s d3 Open 0
+s d4 Open 0
 main:
 l r0 d0 Open
 seq r15 r0 1
@@ -37,6 +40,24 @@ s d1 Open 0
 s d2 Open 0
 j main
 if3exit:
-s d5 Setting 0
+l r4 d4 Open
+seq r15 r4 1
+beqz r15 if4exit
+s d5 Setting 5
+s d0 Open 0
+s d1 Open 0
+s d2 Open 0
+s d3 Open 0
+j main
+if4exit:
+l r5 d5 Setting
+sgt r15 r5 5
+beqz r15 if5exit
+s d0 Open 0
+s d1 Open 0
+s d2 Open 0
+s d3 Open 0
+s d4 Open 0
+if5exit:
 yield
 j main
