@@ -1,0 +1,28 @@
+s d1 On 1
+s d2 On 0
+s d2 Mode 1
+move r0 0
+main:
+l r1 d0 Temperature
+seq r15 r0 1
+sge r14 r1 300
+and r13 r15 r14
+beqz r13 if0exit
+move r0 0
+if0exit:
+slt r15 r1 295
+beqz r15 if1exit
+move r0 1
+if1exit:
+l r2 d0 Pressure
+sgt r15 r2 95
+beqz r15 if2else
+s d2 On 1
+j if2exit
+if2else:
+s d2 On 0
+if2exit:
+s d1 On r0
+s db Setting r0
+yield
+j main

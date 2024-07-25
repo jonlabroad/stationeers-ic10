@@ -1,0 +1,75 @@
+alias AutolatheRouter d0
+alias PipeBenderRouter d1
+alias ElectronicsRouter d2
+alias ToolsRouter d3
+#alias RocketRouter d4
+alias Destination d5
+
+const ENABLED = 1
+const DISABLED = 0
+
+const AUTOLATHE_VAL = 0
+const PIPEBENDER_VAL = 1
+const ELECTRONICS_VAL = 2
+const TOOLS_VAL = 3
+const ROCKET_VAL = 4
+const PURGE_VAL = 5
+
+AutolatheRouter.On = 1
+PipeBenderRouter.On = 1
+ElectronicsRouter.On = 1
+ToolsRouter.On = 1
+#RocketRouter.On = 1
+
+main:
+    var destination = Destination.Setting
+    if destination == AUTOLATHE_VAL
+        AutolatheRouter.Mode = ENABLED
+        PipeBenderRouter.Mode = DISABLED
+        ElectronicsRouter.Mode = DISABLED
+        ToolsRouter.Mode = DISABLED
+        #RocketRouter.Mode = DISABLED
+    end
+
+    if destination == PIPEBENDER_VAL
+        AutolatheRouter.Mode = DISABLED
+        PipeBenderRouter.Mode = ENABLED
+        ElectronicsRouter.Mode = DISABLED
+        ToolsRouter.Mode = DISABLED
+        #RocketRouter.Mode = DISABLED
+    end
+
+    if destination == ELECTRONICS_VAL
+        AutolatheRouter.Mode = DISABLED
+        PipeBenderRouter.Mode = DISABLED
+        ElectronicsRouter.Mode = ENABLED
+        ToolsRouter.Mode = DISABLED
+        #RocketRouter.Mode = DISABLED
+    end
+
+    if destination == TOOLS_VAL
+        AutolatheRouter.Mode = DISABLED
+        PipeBenderRouter.Mode = DISABLED
+        ElectronicsRouter.Mode = DISABLED
+        ToolsRouter.Mode = ENABLED
+        #RocketRouter.Mode = DISABLED
+    end
+
+    if destination == ROCKET_VAL
+        AutolatheRouter.Mode = DISABLED
+        PipeBenderRouter.Mode = DISABLED
+        ElectronicsRouter.Mode = DISABLED
+        ToolsRouter.Mode = DISABLED
+        #RocketRouter.Mode = ENABLED
+    end
+
+    if destination > ROCKET_VAL
+        AutolatheRouter.Mode = DISABLED
+        PipeBenderRouter.Mode = DISABLED
+        ElectronicsRouter.Mode = DISABLED
+        ToolsRouter.Mode = DISABLED
+        #RocketRouter.Mode = DISABLED
+    end
+
+    yield
+j main

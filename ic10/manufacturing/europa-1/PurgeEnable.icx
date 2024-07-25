@@ -1,0 +1,36 @@
+alias PurgeSwitch d0
+alias PurgeRouter d1
+alias Destination d5
+
+const ENABLED = 1
+const DISABLED = 0
+
+const AUTOLATHE_VAL = 0
+const PIPEBENDER_VAL = 1
+const ELECTRONICS_VAL = 2
+const TOOLS_VAL = 3
+const ROCKET_VAL = 4
+const PURGE_VAL = 5
+
+PurgeSwitch.Open = DISABLED
+PurgeRouter.On = ENABLED
+PurgeRouter.Mode = DISABLED
+
+main:
+    var purgeEnable = PurgeSwitch.Open
+    if purgeEnable == ENABLED
+        Destination.Setting = PURGE_VAL
+    end
+
+    var setting = Destination.Setting
+    if  setting == PURGE_VAL
+        PurgeRouter.Mode = ENABLED
+    else
+        PurgeRouter.Mode = DISABLED
+    end
+
+    var currMode = PurgeRouter.Mode
+    db.Setting = currMode
+
+    yield
+j main

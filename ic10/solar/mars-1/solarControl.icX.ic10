@@ -1,0 +1,19 @@
+l r0 d1 PrefabHash
+move r1 90
+move r2 0
+move r3 90
+main:
+l r4 d0 Vertical
+l r5 d0 Horizontal
+sgtz r15 r4
+slt r14 r4 90
+and r13 r15 r14
+beqz r13 if0exit
+sub r1 90 r4
+sub r2 r5 90
+if0exit:
+move r3 r4
+sb r0 Vertical r1
+sb r0 Horizontal r2
+yield
+j main

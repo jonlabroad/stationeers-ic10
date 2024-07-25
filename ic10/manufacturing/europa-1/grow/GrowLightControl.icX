@@ -1,0 +1,21 @@
+alias DaylightSensor d0
+alias GrowLight0 d1
+alias GrowLight1 d2
+
+const ENABLED = 1
+const DISABLED = 0
+
+main:
+    var lightOn = ENABLED
+    var horizontal = DaylightSensor.Horizontal
+    var vertical = DaylightSensor.Vertical
+
+    if vertical > 120
+        lightOn = DISABLED
+    end
+
+    db.Setting = vertical
+    GrowLight0.On = lightOn
+    GrowLight1.On = lightOn
+    yield
+j main

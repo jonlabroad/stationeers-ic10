@@ -1,0 +1,53 @@
+alias Hydro0 d0
+alias Harvie0 d1
+
+const ENABLE = 1
+const DISABLE = 0
+const TRUE = 1
+const FALSE = 0
+const HYDRO_PLANT_SLOT = 0
+const HARVIE_SEED_SLOT = 0
+
+Harvie0.On = ENABLE
+db.Setting = -1
+
+main:
+    # If nothing planted and we have seeds, plant!
+    # 	Idle = 0, Planting = 1, Harvesting = 2
+    var harvie0Status = Harvie0.Activate
+    if harvie0Status == 0 #Idle
+        db.Setting = 0
+        var hydro0Occupied = Hydro0.slot(HYDRO_PLANT_SLOT).Occupied
+        if hydro0Occupied == 0
+            var harvie0Seeds = Harvie0.slot(HARVIE_SEED_SLOT).Occupied
+            if harvie0Seeds == 1
+                Harvie0.Plant = 1
+                db.Setting = 1
+                sleep 10
+            end
+        else
+            # Is it mature?
+            var seeding0 = Hydro0.slot(HYDRO_PLANT_SLOT).Seeding
+            if seeding0 == 1
+                db.Setting = 2
+                harvestLoop:
+                    Harvie0.Harvest = 1
+                    waitLoop:
+                        var running0 = Harvie0.Activate
+                        if running0 == 1
+                            db.Setting = 3
+                            sleep 10
+                            j waitLoop
+                        end
+                    var isMature0 = Hydro0.slot(HYDRO_PLANT_SLOT).Mature
+                    if isMature0 == TRUE
+                        db.Setting = 4
+                        sleep 10
+                        j harvestLoop
+                    end
+                end
+            end
+        end
+
+    yield
+j main

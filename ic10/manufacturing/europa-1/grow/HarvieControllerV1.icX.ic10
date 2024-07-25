@@ -1,0 +1,45 @@
+s d1 On 1
+s db Setting -1
+main:
+l r0 d1 Activate
+seqz r15 r0
+beqz r15 if0exit
+s db Setting 0
+ls r1 d0 0 Occupied
+seqz r14 r1
+beqz r14 if1else
+ls r2 d1 0 Occupied
+seq r13 r2 1
+beqz r13 if2exit
+s d1 Plant 1
+s db Setting 1
+sleep 10
+if2exit:
+j if1exit
+if1else:
+ls r3 d0 0 Seeding
+seq r13 r3 1
+beqz r13 if3exit
+s db Setting 2
+harvestLoop:
+s d1 Harvest 1
+waitLoop:
+l r4 d1 Activate
+seq r12 r4 1
+beqz r12 if4exit
+s db Setting 3
+sleep 10
+j waitLoop
+if4exit:
+ls r5 d0 0 Mature
+seq r12 r5 1
+beqz r12 if5exit
+s db Setting 4
+sleep 10
+j harvestLoop
+if5exit:
+if3exit:
+if1exit:
+if0exit:
+yield
+j main

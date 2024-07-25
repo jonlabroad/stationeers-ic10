@@ -1,0 +1,76 @@
+alias AutolatheLight d0
+alias PipeBenderLight d1
+alias ElectronicsLight d2
+alias ToolsLight d3
+alias RocketLight d4
+alias Destination d5
+
+const ENABLED = 1
+const DISABLED = 0
+const COLOR = 2
+
+const AUTOLATHE_VAL = 0
+const PIPEBENDER_VAL = 1
+const ELECTRONICS_VAL = 2
+const TOOLS_VAL = 3
+const ROCKET_VAL = 4
+const PURGE_VAL = 5
+
+AutolatheLight.On = DISABLED
+PipeBenderLight.On = DISABLED
+ElectronicsLight.On = DISABLED
+#RocketLight.On = DISABLED
+ToolsLight.On = DISABLED
+
+main:
+    var destination = Destination.Setting
+    if destination == AUTOLATHE_VAL
+        AutolatheLight.On = ENABLED
+        PipeBenderLight.On = DISABLED
+        ElectronicsLight.On = DISABLED
+        ToolsLight.On = DISABLED
+        #RocketLight.On = DISABLED
+    end
+
+    if destination == PIPEBENDER_VAL
+        AutolatheLight.On = DISABLED
+        PipeBenderLight.On = ENABLED
+        ElectronicsLight.On = DISABLED
+        ToolsLight.On = DISABLED
+        #RocketLight.On = DISABLED
+    end
+
+    if destination == ELECTRONICS_VAL
+        AutolatheLight.On = DISABLED
+        PipeBenderLight.On = DISABLED
+        ElectronicsLight.On = ENABLED
+        ToolsLight.On = DISABLED
+        #RocketLight.On = DISABLED
+    end
+
+    if destination == TOOLS_VAL
+        AutolatheLight.On = DISABLED
+        PipeBenderLight.On = DISABLED
+        ElectronicsLight.On = DISABLED
+        ToolsLight.On = ENABLED
+        #RocketLight.On = DISABLED
+    end
+
+    if destination == ROCKET_VAL
+        AutolatheLight.On = DISABLED
+        PipeBenderLight.On = DISABLED
+        ElectronicsLight.On = DISABLED
+        ToolsLight.On = DISABLED
+        #RocketLight.On = ENABLED
+    end
+
+    if destination >= PURGE_VAL
+        AutolatheLight.On = DISABLED
+        PipeBenderLight.On = DISABLED
+        ElectronicsLight.On = DISABLED
+        ToolsLight.On = DISABLED
+        #RocketLight.On = DISABLED
+    end
+
+    yield
+j main

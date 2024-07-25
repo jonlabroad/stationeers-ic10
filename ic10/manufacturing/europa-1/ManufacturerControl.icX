@@ -1,0 +1,77 @@
+alias Autolathe d0
+alias PipeBender d1
+alias Electronics d2
+alias Tools d3
+alias Rocket d4
+alias Destination d5
+
+const ENABLED = 1
+const DISABLED = 0
+
+const AUTOLATHE_VAL = 0
+const PIPEBENDER_VAL = 1
+const ELECTRONICS_VAL = 2
+const TOOLS_VAL = 3
+const ROCKET_VAL = 4
+const PURGE_VAL = 5
+
+main:
+    var destination = Destination.Setting
+    if destination == ROCKET_VAL
+        #Rocket.Open = DISABLED
+        Autolathe.Open = ENABLED
+        PipeBender.Open = ENABLED
+        Electronics.Open = ENABLED
+        Tools.Open = ENABLED
+    end
+
+    if destination == AUTOLATHE_VAL
+        #Rocket.Open = ENABLED
+        Autolathe.Open = DISABLED
+        PipeBender.Open = ENABLED
+        Electronics.Open = ENABLED
+        Tools.Open = ENABLED
+    end
+
+    if destination == PIPEBENDER_VAL
+        #Rocket.Open = ENABLED
+        Autolathe.Open = ENABLED
+        PipeBender.Open = DISABLED
+        Electronics.Open = ENABLED
+        Tools.Open = ENABLED
+    end
+
+    if destination == ELECTRONICS_VAL
+        #Rocket.Open = ENABLED
+        Autolathe.Open = ENABLED
+        PipeBender.Open = ENABLED
+        Electronics.Open = DISABLED
+        Tools.Open = ENABLED
+    end
+
+    if destination == TOOLS_VAL
+        #Rocket.Open = ENABLED
+        Autolathe.Open = ENABLED
+        PipeBender.Open = ENABLED
+        Electronics.Open = ENABLED
+        Tools.Open = DISABLED
+    end
+
+    if destination == PURGE_VAL
+        #Rocket.Open = ENABLED
+        Autolathe.Open = ENABLED
+        PipeBender.Open = ENABLED
+        Electronics.Open = ENABLED
+        Tools.Open = ENABLED       
+    end
+
+    if destination > PURGE_VAL
+        #Rocket.Open = ENABLED
+        Autolathe.Open = ENABLED
+        PipeBender.Open = ENABLED
+        Electronics.Open = ENABLED
+        Tools.Open = ENABLED
+    end
+
+    yield
+j main

@@ -1,0 +1,59 @@
+alias AtmoAnalyzer d0
+alias Pump d1
+alias SupplyAnalyzer d2
+#alias Heater d3
+
+const ENABLED = 1
+const DISABLED = 0
+
+const RIGHT = 0
+const LEFT = 1
+
+Pump.On = DISABLED
+Pump.Mode = RIGHT
+Pump.Setting = 100
+
+AtmoAnalyzer.On = ENABLED
+SupplyAnalyzer.On = ENABLED
+
+#Heater.On = DISABLED
+
+main:
+    var atmoO2Ratio = AtmoAnalyzer.RatioOxygen
+    if atmoO2Ratio < 1.0
+        Pump.On = DISABLED
+        yield
+        j main
+    end
+
+    var supplyO2Ratio = SupplyAnalyzer.RatioOxygen
+    if supplyO2Ratio < 1.0
+        Pump.On = DISABLED
+        yield
+        j main
+    end
+
+    var supplyPressure = SupplyAnalyzer.Pressure
+    if supplyPressure < 12000
+            Pump.Mode = RIGHT
+            Pump.Setting = 199
+            Pump.On = ENABLED
+    else
+        if supplyPressure > 19000
+            Pump.Mode = LEFT
+            Pump.Setting = 40
+            Pump.On = ENABLED
+        else
+            Pump.On = DISABLED
+        end
+    end
+
+    var supplyTemperature = SupplyAnalyzer.Temperature
+    if supplyTemperature < 200
+        #Heater.On = ENABLED
+    else
+        #Heater.On = DISABLED
+    end
+
+    yield
+j main
