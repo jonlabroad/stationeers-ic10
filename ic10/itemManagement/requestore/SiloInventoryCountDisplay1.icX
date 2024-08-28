@@ -1,0 +1,42 @@
+alias SiloNumDial d0
+alias SiloQtyDisplay d1
+alias Silo4 d2
+alias Silo5 d3
+alias Silo6 d4
+alias Silo7 d5
+
+const SILO0 = 0
+const SILO1 = 1
+const SILO2 = 2
+const SILO3 = 3
+const SILO4 = 4
+const SILO5 = 5
+const SILO6 = 6
+const SILO7 = 7
+const SILO8 = 8
+
+
+main:
+    var siloId = SiloNumDial.Setting
+    var qtyVal = -1
+    if siloId >= SILO4 && siloId <= SILO7
+        if siloId == SILO4
+            qtyVal = Silo4.Quantity
+        end
+        if siloId == SILO5
+            qtyVal = Silo5.Quantity
+        end
+        if siloId == SILO6
+            qtyVal = Silo6.Quantity
+        end
+        if siloId == SILO7
+            qtyVal = Silo7.Quantity
+        end  
+
+        if qtyVal > 0
+            SiloQtyDisplay.Setting = qtyVal
+        end
+    end
+
+    yield
+j main

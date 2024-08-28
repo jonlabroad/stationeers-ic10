@@ -1,0 +1,95 @@
+clr db
+main:
+clr db
+move r16 0
+ls r0 d0 0 Occupied
+ls r1 d0 0 Mature
+ls r2 d0 0 Seeding
+push r0
+push r1
+push r2
+ls r0 d1 0 Occupied
+ls r1 d1 0 Mature
+ls r2 d1 0 Seeding
+push r0
+push r1
+push r2
+ls r0 d2 0 Occupied
+ls r1 d2 0 Mature
+ls r2 d2 0 Seeding
+push r0
+push r1
+push r2
+ls r0 d3 0 Occupied
+ls r1 d3 0 Mature
+ls r2 d3 0 Seeding
+push r0
+push r1
+push r2
+move r3 0
+mainloop:
+while0:
+slt r15 r3 4
+beqz r15 while0exit
+l r4 d5 Setting
+l r5 d4 Setting
+add r14 r3 1
+mul r16 3 r14
+peek r2
+sub r16 r16 1
+peek r1
+sub r16 r16 1
+peek r0
+sub r16 r16 1
+seq r14 r3 1
+beqz r14 if0exit
+s db Setting r0
+if0exit:
+add r6 3 r3
+seq r14 r0 0
+beqz r14 if1else
+seq r13 r5 -1
+beqz r13 if2exit
+s d4 Setting r6
+s d5 Setting 0
+add r3 r3 1
+j mainloop
+if2exit:
+seq r13 r4 1
+seq r12 r5 r6
+and r11 r13 r12
+beqz r11 if3exit
+s d4 Setting -1
+s d5 Setting -1
+add r3 r3 1
+j mainloop
+if3exit:
+j if1exit
+if1else:
+seq r13 r4 0
+seq r12 r5 r6
+and r11 r13 r12
+beqz r11 if4exit
+s d4 Setting -1
+s d5 Setting -1
+add r3 r3 1
+j mainloop
+if4exit:
+seq r13 r1 1
+seq r12 r2 1
+and r11 r13 r12
+beqz r11 if5exit
+seq r10 r5 -1
+beqz r10 if6exit
+s d4 Setting r6
+s d5 Setting 1
+add r3 r3 1
+j mainloop
+if6exit:
+if5exit:
+if1exit:
+add r3 r3 1
+j while0
+while0exit:
+yield
+j main

@@ -1,0 +1,27 @@
+alias Mixer d0
+alias MixAnalyzer d1
+alias FuelPressureRegulator d2
+alias FuelAnalyzer d3
+
+const ENABLE = 1
+const DISABLE = 0
+
+const MIX_HIGH_PRESSURE = 6000
+const MIX_LOW_PRESSURE = 1000
+
+Mixer.On = DISABLE
+FuelPressureRegulator.On = ENABLE
+
+var mixerOn = DISABLE
+main:
+    var mixPressure = MixAnalyzer.Pressure
+    if mixPressure < MIX_LOW_PRESSURE
+        mixerOn = ENABLE
+    end
+    if mixerOn == ENABLE && mixPressure > MIX_HIGH_PRESSURE
+        mixerOn = DISABLE
+    end
+    Mixer.On = mixerOn
+
+    yield
+j main

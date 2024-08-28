@@ -1,0 +1,94 @@
+alias Tumbler d0
+alias WarningLight d1
+
+const ENABLED = 1
+const DISABLED = 0
+
+const STATE_ON = 0
+const STATE_OPEN = 1
+
+const THROTTLE_INC = 10
+const COMBUSTION_INC = 20
+const MAX_REAGENTS = 390
+
+var throttleSetting = 0
+var combustionSetting = 0
+var sleepTime = 0
+Tumbler.Open = DISABLED
+
+const STATE_INCREASE = 0
+const STATE_DECREASE = 1
+const STATE_STOP = 2
+const STATE_SPINNING = 3
+const STATE_IDLE = 4
+const STATE_EMPTY = 5
+var currState = STATE_INCREASE
+
+WarningLight.On = DISABLED
+
+main:
+	sleepTime = 0
+	var currRpm = Tumbler.Rpm
+	var currStress = Tumbler.Stress
+
+	if throttleSetting >= 100 && combustionSetting >= 100
+		currState = STATE_SPINNING
+	end
+
+    var numReagents = Tumbler.Reagents
+	if numReagents >= MAX_REAGENTS
+		currState = STATE_STOP
+	end
+
+	if currState == STATE_INCREASE
+		Tumbler.On = ENABLED
+		if currStress < 2
+			throttleSetting = throttleSetting + THROTTLE_INC
+			if throttleSetting >= 100
+				combustionSetting = combustionSetting + COMBUSTION_INC
+			end
+			sleepTime = 4
+		end
+	end
+	
+	if currState == STATE_STOP
+		throttleSetting = 0
+		combustionSetting = 0
+
+        WarningLight.On = ENABLED
+        Tumbler.On = DISABLED
+
+		currState = STATE_EMPTY
+	end
+
+	if currState == STATE_EMPTY
+		var rpm = Tumbler.Rpm
+		if rpm <= 0
+			Tumbler.Open = ENABLED
+			sleep 60
+			WarningLight.On = DISABLED
+			Tumbler.Open = DISABLED
+			currState = STATE_INCREASE
+		end
+	end
+	
+    if throttleSetting > 100
+        throttleSetting = 100
+    end
+    if throttleSetting < 0
+        throttleSetting = 0
+    end
+    if combustionSetting > 100
+        combustionSetting = 100
+    end
+    if combustionSetting < 0
+        combustionSetting = 0
+    end
+
+	Tumbler.Throttle = throttleSetting
+	Tumbler.CombustionLimiter = combustionSetting
+	if sleepTime > 0
+		sleep sleepTime
+	end
+	yield
+j main

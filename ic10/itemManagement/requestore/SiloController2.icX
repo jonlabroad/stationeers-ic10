@@ -1,10 +1,9 @@
 alias SiloIdMem d0
 alias SiloNumMem d1
 alias Silo0 d2
-alias Silo1 d3
-alias Silo2 d4
-alias Silo3 d5
-alias SelectedSilo d2
+#alias Silo1 d3
+#alias Silo2 d4
+#alias Silo3 d5
 
 const SILO0 = 8
 const SILO1 = 9
@@ -15,17 +14,17 @@ Silo0.On = 1
 Silo0.Open = 0
 Silo0.ClearMemory = 1
 
-Silo1.On = 1
-Silo1.Open = 0
-Silo1.ClearMemory = 1
+#Silo1.On = 1
+#Silo1.Open = 0
+#Silo1.ClearMemory = 1
 
-Silo2.On = 1
-Silo2.Open = 0
-Silo2.ClearMemory = 1
+#Silo2.On = 1
+#Silo2.Open = 0
+#Silo2.ClearMemory = 1
 
-Silo3.On = 1
-Silo3.Open = 0
-Silo3.ClearMemory = 1
+#Silo3.On = 1
+#Silo3.Open = 0
+#Silo3.ClearMemory = 1
 
 var numSent = 0
 
@@ -41,21 +40,21 @@ main:
                 numSent = Silo0.ExportCount
                 numSent++
             end
-            if siloId == SILO1
-                Silo1.Open = 1
-                numSent = Silo1.ExportCount
-                numSent++
-            end
-            if siloId == SILO2
-                Silo2.Open = 1
-                numSent = Silo2.ExportCount
-                numSent++
-            end
-            if siloId == SILO3
-                Silo3.Open = 1
-                numSent = Silo3.ExportCount
-                numSent++
-            end
+#            if siloId == SILO1
+#                Silo1.Open = 1
+#                numSent = Silo1.ExportCount
+#                numSent++
+#            end
+#            if siloId == SILO2
+#                Silo2.Open = 1
+#                numSent = Silo2.ExportCount
+#                numSent++
+#            end
+#            if siloId == SILO3
+#                Silo3.Open = 1
+#                numSent = Silo3.ExportCount
+#                numSent++
+#            end
         else
             # We are done
             numSent = 0
@@ -63,23 +62,23 @@ main:
             SiloIdMem.Setting = 0
             Silo0.Open = 0
             Silo0.ClearMemory = 1
-            Silo1.Open = 0
-            Silo1.ClearMemory = 1
-            Silo2.Open = 0
-            Silo2.ClearMemory = 1
-            Silo3.Open = 0
-            Silo3.ClearMemory = 1
+#            Silo1.Open = 0
+#            Silo1.ClearMemory = 1
+#            Silo2.Open = 0
+#            Silo2.ClearMemory = 1
+#            Silo3.Open = 0
+#            Silo3.ClearMemory = 1
         end
     else
         numSent = 0
         Silo0.Open = 0
         Silo0.ClearMemory = 1
-        Silo1.Open = 0
-        Silo1.ClearMemory = 1
-        Silo2.Open = 0
-        Silo2.ClearMemory = 1
-        Silo3.Open = 0
-        Silo3.ClearMemory = 1
+#        Silo1.Open = 0
+#        Silo1.ClearMemory = 1
+#        Silo2.Open = 0
+#        Silo2.ClearMemory = 1
+#        Silo3.Open = 0
+#        Silo3.ClearMemory = 1
     end
 
     yield

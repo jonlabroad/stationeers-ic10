@@ -1,0 +1,32 @@
+alias GasMixer d0
+alias PressureRegulator d1
+alias Analyzer d2
+alias MixedGasPipeAnalyzer d3
+
+const ENABLED = 1
+const DISABLED = 0
+
+const STATE_ON = 0
+const STATE_OPEN = 1
+
+const DESIRED_PRESSURE = 4000
+
+GasMixer.On = DISABLED
+PressureRegulator.On = DISABLED
+Analyzer.On = ENABLED
+MixedGasPipeAnalyzer.On = ENABLED
+
+main:
+    var tankPressure = Analyzer.Pressure
+    var mixedGasPressure = MixedGasPipeAnalyzer.Pressure
+    if tankPressure < DESIRED_PRESSURE
+        if mixedGasPressure < 10000
+            GasMixer.On = ENABLED
+        end
+        PressureRegulator.On = ENABLED
+    else
+        GasMixer.On = DISABLED
+        PressureRegulator.On = DISABLED
+    end
+    yield
+j main

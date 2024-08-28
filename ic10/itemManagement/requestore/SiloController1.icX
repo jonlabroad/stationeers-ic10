@@ -4,7 +4,6 @@ alias Silo0 d2
 alias Silo1 d3
 alias Silo2 d4
 alias Silo3 d5
-alias SelectedSilo d2
 
 const SILO0 = 4
 const SILO1 = 5

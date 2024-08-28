@@ -1,0 +1,18 @@
+s d0 On 0
+s d2 On 1
+move r0 0
+main:
+l r1 d1 Pressure
+slt r15 r1 1000
+beqz r15 if0exit
+move r0 1
+if0exit:
+seq r15 r0 1
+sgt r14 r1 6000
+and r13 r15 r14
+beqz r13 if1exit
+move r0 0
+if1exit:
+s d0 On r0
+yield
+j main

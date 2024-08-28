@@ -1,0 +1,33 @@
+s d0 On 0
+s d0 Mode 0
+s d2 On 0
+move r0 0
+move r1 0
+main:
+l r2 d1 Pressure
+l r3 d1 RatioCarbonDioxide
+slt r15 r2 55
+beqz r15 if0exit
+move r0 1
+if0exit:
+seq r15 r0 1
+sge r14 r2 85
+and r13 r15 r14
+beqz r13 if1exit
+move r0 0
+if1exit:
+slt r15 r3 0.02
+beqz r15 if2exit
+move r1 1
+if2exit:
+seq r15 r1 1
+sgt r14 r3 0.10
+and r13 r15 r14
+beqz r13 if3exit
+move r1 0
+if3exit:
+s d0 On r0
+s d2 On r1
+s db Setting r3
+yield
+j main

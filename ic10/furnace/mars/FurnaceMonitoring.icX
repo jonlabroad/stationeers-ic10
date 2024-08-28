@@ -1,0 +1,13 @@
+alias AdvancedFurnace d0
+alias GraphPressure d1
+alias GraphTemperature d2
+
+main:
+    var furnacePressure = AdvancedFurnace.Pressure
+    var furnaceTemp = AdvancedFurnace.Temperature
+
+    GraphPressure.Setting = furnacePressure
+    GraphTemperature.Setting = furnaceTemp
+
+    yield
+j main

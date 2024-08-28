@@ -1,15 +1,6 @@
 s d2 On 1
 s d2 Open 0
 s d2 ClearMemory 1
-s d3 On 1
-s d3 Open 0
-s d3 ClearMemory 1
-s d4 On 1
-s d4 Open 0
-s d4 ClearMemory 1
-s d5 On 1
-s d5 Open 0
-s d5 ClearMemory 1
 move r0 0
 main:
 l r1 d0 Setting
@@ -27,24 +18,6 @@ s d2 Open 1
 l r0 d2 ExportCount
 add r0 r0 1
 if2exit:
-seq r11 r1 9
-beqz r11 if3exit
-s d3 Open 1
-l r0 d3 ExportCount
-add r0 r0 1
-if3exit:
-seq r11 r1 10
-beqz r11 if4exit
-s d4 Open 1
-l r0 d4 ExportCount
-add r0 r0 1
-if4exit:
-seq r11 r1 11
-beqz r11 if5exit
-s d5 Open 1
-l r0 d5 ExportCount
-add r0 r0 1
-if5exit:
 j if1exit
 if1else:
 move r0 0
@@ -52,24 +25,12 @@ s d1 Setting 0
 s d0 Setting 0
 s d2 Open 0
 s d2 ClearMemory 1
-s d3 Open 0
-s d3 ClearMemory 1
-s d4 Open 0
-s d4 ClearMemory 1
-s d5 Open 0
-s d5 ClearMemory 1
 if1exit:
 j if0exit
 if0else:
 move r0 0
 s d2 Open 0
 s d2 ClearMemory 1
-s d3 Open 0
-s d3 ClearMemory 1
-s d4 Open 0
-s d4 ClearMemory 1
-s d5 Open 0
-s d5 ClearMemory 1
 if0exit:
 yield
 j main

@@ -1,0 +1,21 @@
+alias DaylightSensor d0
+alias GrowLight d1
+
+var GROW_LIGHT_HASH = d1.PrefabHash
+
+const ENABLE = 1
+const DISABLE = 0
+
+const maxOnVertical = 175
+const minOnVertical = 80
+
+main:
+    var vertical = DaylightSensor.Vertical
+    if vertical > minOnVertical && vertical < maxOnVertical
+        d(GROW_LIGHT_HASH).On = ENABLE
+    else
+        d(GROW_LIGHT_HASH).On = DISABLE
+    end
+
+    yield
+j main

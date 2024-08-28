@@ -1,0 +1,18 @@
+alias GasSensor d0
+alias ExhaustVent d1
+
+const ENABLE = 1
+const DISABLE = 0
+
+ExhaustVent.On = DISABLE
+
+main:
+    var pressure = GasSensor.Pressure;
+    if pressure > 0.0001
+        ExhaustVent.On = ENABLE
+    else
+        ExhaustVent.On = DISABLE
+    end
+
+    yield
+j main

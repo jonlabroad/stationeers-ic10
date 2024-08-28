@@ -1,0 +1,35 @@
+alias OccSensor d0
+alias Light0 d1
+alias Light1 d2
+alias Light2 d3
+#alias Light3 d4
+#alias Light4 d5
+
+const ENABLE = 1
+const DISABLE = 0
+
+Light0.On = DISABLE
+Light1.On = DISABLE
+Light2.On = DISABLE
+#Light3.On = DISABLE
+#Light4.On = DISABLE
+#OccSensor.Activate = ENABLE
+
+var enabled = DISABLE
+
+main:
+    var occSetting = OccSensor.Quantity
+    if occSetting >= 1
+        enabled = ENABLE
+    else
+        enabled = DISABLE
+    end
+
+    Light0.On = enabled
+    Light1.On = enabled
+    Light2.On = enabled
+ #   Light3.On = enabled
+ #   Light4.On = enabled
+
+    yield
+j main

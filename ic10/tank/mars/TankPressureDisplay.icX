@@ -1,0 +1,25 @@
+alias Tank0 d0
+alias Display0 d1
+alias Tank1 d2
+alias Display1 d3
+alias Tank2 d4
+alias Display2 d5
+
+const ENABLE = 1
+const DISABLE = 0
+
+Display0.On = ENABLE
+Display1.On = ENABLE
+Display2.On = ENABLE
+
+main:
+    var value0 = Tank0.TotalMoles;
+    var value1 = Tank1.TotalMoles;
+    var value2 = Tank2.TotalMoles;
+
+    Display0.Setting = value0;
+    Display1.Setting = value1;
+    Display2.Setting = value2;
+
+    yield
+j main

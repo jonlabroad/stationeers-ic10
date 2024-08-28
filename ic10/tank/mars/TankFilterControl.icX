@@ -1,0 +1,30 @@
+alias Analyzer0 d0
+alias Filter0 d1
+alias Analyzer1 d2
+alias Filter1 d3
+
+const ENABLE = 1
+const DISABLE = 0
+
+const pressureThreshold = 0.001
+
+Analyzer0.On = ENABLE
+Analyzer1.On = ENABLE
+
+main:
+    var pressure0 = Analyzer0.Pressure;
+    if pressure0 > pressureThreshold
+        Filter0.On = ENABLE
+    else
+        Filter0.On = DISABLE
+    end
+
+    var pressure1 = Analyzer1.Pressure;
+    if pressure1 > pressureThreshold
+        Filter1.On = ENABLE
+    else
+        Filter1.On = DISABLE
+    end
+
+    yield
+j main

@@ -1,19 +1,22 @@
 l r0 d1 PrefabHash
-move r1 90
-move r2 0
-move r3 90
+l r1 d2 PrefabHash
+move r2 90
+move r3 0
+move r4 90
 main:
-l r4 d0 Vertical
-l r5 d0 Horizontal
-sgtz r15 r4
-slt r14 r4 90
+l r5 d0 Vertical
+l r6 d0 Horizontal
+sgtz r15 r5
+slt r14 r5 90
 and r13 r15 r14
 beqz r13 if0exit
-sub r1 90 r4
-sub r2 r5 90
+sub r2 90 r5
+sub r3 r6 90
 if0exit:
-move r3 r4
-sb r0 Vertical r1
-sb r0 Horizontal r2
+move r4 r5
+sb r0 Vertical r2
+sb r0 Horizontal r3
+sb r1 Vertical r2
+sb r1 Horizontal r3
 yield
 j main

@@ -1,0 +1,7 @@
+main:
+l r0 d0 Pressure
+l r1 d0 Temperature
+s d1 Setting r0
+s d2 Setting r1
+yield
+j main

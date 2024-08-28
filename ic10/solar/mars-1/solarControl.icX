@@ -1,6 +1,8 @@
 alias DaylightSensor d0
 alias SolarPanel1 d1
+alias SolarPanelHeavy d2
 var SOLAR_HASH = d1.PrefabHash
+var SOLAR_HEAVY_HASH = d2.PrefabHash
 
 var vertical = 90
 var horizontal = 0
@@ -19,5 +21,7 @@ main:
 
     d(SOLAR_HASH).Vertical = vertical
     d(SOLAR_HASH).Horizontal = horizontal
+    d(SOLAR_HEAVY_HASH).Vertical = vertical
+    d(SOLAR_HEAVY_HASH).Horizontal = horizontal
     yield
 j main

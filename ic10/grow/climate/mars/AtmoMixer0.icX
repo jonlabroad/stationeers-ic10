@@ -1,0 +1,23 @@
+alias Mixer d0
+alias MixAnalyzer d1
+alias PressureReg d2
+
+const ENABLE = 1
+const DISABLE = 0
+
+const MAX_MIX_PRESSURE = 3000
+
+Mixer.On = DISABLE
+MixAnalyzer.On = ENABLE
+PressureReg.On = ENABLE
+
+main:
+    var mixPipePressure = MixAnalyzer.Pressure
+    if mixPipePressure > MAX_MIX_PRESSURE
+        Mixer.On = DISABLE
+    else
+        Mixer.On = ENABLE
+    end
+
+    yield
+j main

@@ -1,0 +1,78 @@
+move r0 0
+move r1 0
+move r2 0
+s d0 Open 0
+move r3 0
+s d1 On 0
+main:
+move r2 0
+l r4 d0 Rpm
+l r5 d0 Stress
+sge r15 r0 100
+sge r14 r1 100
+and r13 r15 r14
+beqz r13 if0exit
+move r3 3
+if0exit:
+l r6 d0 Reagents
+sge r15 r6 390
+beqz r15 if1exit
+move r3 2
+if1exit:
+seq r15 r3 0
+beqz r15 if2exit
+s d0 On 1
+slt r14 r5 2
+beqz r14 if3exit
+add r0 r0 10
+sge r13 r0 100
+beqz r13 if4exit
+add r1 r1 20
+if4exit:
+move r2 4
+if3exit:
+if2exit:
+seq r15 r3 2
+beqz r15 if5exit
+move r0 0
+move r1 0
+s d1 On 1
+s d0 On 0
+move r3 5
+if5exit:
+seq r15 r3 5
+beqz r15 if6exit
+l r7 d0 Rpm
+slez r14 r7
+beqz r14 if7exit
+s d0 Open 1
+sleep 60
+s d1 On 0
+s d0 Open 0
+move r3 0
+if7exit:
+if6exit:
+sgt r15 r0 100
+beqz r15 if8exit
+move r0 100
+if8exit:
+sltz r15 r0
+beqz r15 if9exit
+move r0 0
+if9exit:
+sgt r15 r1 100
+beqz r15 if10exit
+move r1 100
+if10exit:
+sltz r15 r1
+beqz r15 if11exit
+move r1 0
+if11exit:
+s d0 Throttle r0
+s d0 CombustionLimiter r1
+sgtz r15 r2
+beqz r15 if12exit
+sleep r2
+if12exit:
+yield
+j main

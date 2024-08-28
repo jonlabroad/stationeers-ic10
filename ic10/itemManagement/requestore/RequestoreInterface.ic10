@@ -21,7 +21,6 @@ push HASH("ItemNickelOre")
 push HASH("ItemLeadOre")
 push HASH("ItemCobaltOre")
 push HASH("ItemUraniumOre")
-push HASH("ItemOxite")
 
 s RequestSiloIdMem Setting -1
 s RequestSiloNumRemaining Setting 0

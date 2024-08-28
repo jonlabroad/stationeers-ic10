@@ -1,0 +1,40 @@
+alias Mixer d0
+alias MixAnalyzer d1
+alias GasSensor d2
+alias OutputPump d3
+
+const ENABLE = 1
+const DISABLE = 0
+
+const MAX_MIX_PRESSURE = 25000
+
+const LOW_PRESSURE_TARGET = 70
+const HIGH_PRESSURE_TARGET = 80
+
+Mixer.On = DISABLE
+MixAnalyzer.On = ENABLE
+
+var mixerOn = DISABLE
+var outputPumpOn = DISABLE
+main:
+    var mixPipePressure = MixAnalyzer.Pressure
+    if mixPipePressure > MAX_MIX_PRESSURE
+        mixerOn = DISABLE
+    else
+        mixerOn = ENABLE
+    end
+
+    var atmoPressure = GasSensor.Pressure
+    if atmoPressure < LOW_PRESSURE_TARGET
+        outputPumpOn = ENABLE
+    end
+
+    if outputPumpOn == ENABLE && atmoPressure > HIGH_PRESSURE_TARGET
+        outputPumpOn = DISABLE
+    end
+
+    Mixer.On = mixerOn
+    OutputPump.On = outputPumpOn
+    db.Setting = atmoPressure
+    yield
+j main

@@ -1,0 +1,30 @@
+main:
+l r0 d0 Setting
+move r1 -1
+sge r15 r0 0
+sle r14 r0 3
+and r13 r15 r14
+beqz r13 if0exit
+seq r12 r0 0
+beqz r12 if1exit
+l r1 d2 Quantity
+if1exit:
+seq r12 r0 1
+beqz r12 if2exit
+l r1 d3 Quantity
+if2exit:
+seq r12 r0 2
+beqz r12 if3exit
+l r1 d4 Quantity
+if3exit:
+seq r12 r0 3
+beqz r12 if4exit
+l r1 d5 Quantity
+if4exit:
+sgtz r12 r1
+beqz r12 if5exit
+s d1 Setting r1
+if5exit:
+if0exit:
+yield
+j main

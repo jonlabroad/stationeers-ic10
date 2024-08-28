@@ -1,0 +1,16 @@
+s d1 On 0
+s d2 On 0
+move r0 0
+main:
+l r1 d0 Quantity
+sge r15 r1 1
+beqz r15 if0else
+move r0 1
+j if0exit
+if0else:
+move r0 0
+if0exit:
+s d1 On r0
+s d2 On r0
+yield
+j main

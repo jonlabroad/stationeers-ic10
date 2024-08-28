@@ -1,0 +1,120 @@
+alias Hydro0 d0
+alias Hydro1 d1
+alias Hydro2 d2
+alias Hydro3 d3
+alias LarreDestMem d4
+alias LarreOpMem d5
+
+# *** Change this for each group (0, 1, 2, 3, etc)
+const HYDRO_GROUP_OFFSET = 8
+
+const FALSE = 0
+const TRUE = 1
+
+const HYDRO_STATION_BASE = 3
+
+const OPERATION_NULL = -1
+const OPERATION_PLANT = 0
+const OPERATION_HARVEST = 1
+
+const HYDRO_PLANT_SLOT = 0
+
+const DEVICE_STACK_OFFSET = 3
+
+const NUM_HYDROS = 4
+
+clr db
+
+main:
+    # Gather all device values onto stack
+    clr db
+    sp = 0
+
+    var occupied = Hydro0.slot(HYDRO_PLANT_SLOT).Occupied
+    var matured = Hydro0.slot(HYDRO_PLANT_SLOT).Mature
+    var seeding = Hydro0.slot(HYDRO_PLANT_SLOT).Seeding
+    push occupied
+    push matured
+    push seeding
+    occupied = Hydro1.slot(HYDRO_PLANT_SLOT).Occupied
+    matured = Hydro1.slot(HYDRO_PLANT_SLOT).Mature
+    seeding = Hydro1.slot(HYDRO_PLANT_SLOT).Seeding
+    push occupied
+    push matured
+    push seeding
+    occupied = Hydro2.slot(HYDRO_PLANT_SLOT).Occupied
+    matured = Hydro2.slot(HYDRO_PLANT_SLOT).Mature
+    seeding = Hydro2.slot(HYDRO_PLANT_SLOT).Seeding
+    push occupied
+    push matured
+    push seeding
+    occupied = Hydro3.slot(HYDRO_PLANT_SLOT).Occupied
+    matured = Hydro3.slot(HYDRO_PLANT_SLOT).Mature
+    seeding = Hydro3.slot(HYDRO_PLANT_SLOT).Seeding
+    push occupied
+    push matured
+    push seeding
+
+    # For each hydro
+    var hydroDeviceId = 0
+mainloop:
+    while (hydroDeviceId < NUM_HYDROS)
+        var opValue = LarreOpMem.Setting
+        var destValue = LarreDestMem.Setting
+
+        # Reusing vars from earlier
+        sp = DEVICE_STACK_OFFSET * (hydroDeviceId  + 1)
+        peek seeding
+        sp--
+        peek matured
+        sp--
+        peek occupied
+        sp--
+
+        if hydroDeviceId == 1
+            db.Setting = occupied
+        end
+
+        # If nothing is planted, request planting
+        var absoluteStationId = HYDRO_STATION_BASE + HYDRO_GROUP_OFFSET + hydroDeviceId
+        if occupied == FALSE
+            # Slot is empty, request to be planted
+            if destValue == OPERATION_NULL
+                LarreDestMem.Setting = absoluteStationId
+                LarreOpMem.Setting = OPERATION_PLANT
+                hydroDeviceId++
+                j mainloop
+            end
+
+            # Do we need to reset the device/op from a HARVEST op?
+            if opValue == OPERATION_HARVEST && destValue == absoluteStationId
+                LarreDestMem.Setting = OPERATION_NULL
+                LarreOpMem.Setting = OPERATION_NULL
+                hydroDeviceId++
+                j mainloop
+            end
+        else
+            # Slot is occupied
+            # Do we need to reset the device/op from a PLANT op?
+            if opValue == OPERATION_PLANT && destValue == absoluteStationId
+                LarreDestMem.Setting = OPERATION_NULL
+                LarreOpMem.Setting = OPERATION_NULL
+                hydroDeviceId++
+                j mainloop
+            end
+
+            if matured == 1 && seeding == 1
+                # Request to be harvested
+                if destValue == OPERATION_NULL
+                    LarreDestMem.Setting = absoluteStationId
+                    LarreOpMem.Setting = OPERATION_HARVEST
+                    hydroDeviceId++
+                    j mainloop
+                end
+            end
+        end
+        hydroDeviceId++
+    end
+
+    yield
+j main

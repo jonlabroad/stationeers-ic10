@@ -1,0 +1,128 @@
+alias LarreDestMem d0
+alias LarreOpMem d1
+alias Larre d2
+alias ImportBin d3
+
+const FALSE = 0
+const TRUE = 1
+
+const SEED_INPUT_STATION = 2
+const OUTPUT_STATION = 1
+
+const OPERATION_NULL = -1
+const OPERATION_PLANT = 0
+const OPERATION_HARVEST = 1
+
+const HOME_STATION = 0
+
+const STATE_IDLE = 0
+
+const STATE_PLANT_GET_SEEDS = 1
+const STATE_MOVE_TO_PLANT = 2
+const STATE_PLANTING = 3
+
+const STATE_MOVE_TO_OUTPUT = 4
+const STATE_OUTPUT = 5
+
+const STATE_MOVE_TO_HARVEST = 6
+const STATE_HARVESTING = 7
+
+var currState = STATE_IDLE
+
+main:
+    var importBinOccupied = ImportBin.slot(0).Occupied
+    if importBinOccupied == TRUE
+        ImportBin.Open = FALSE
+    else
+        ImportBin.Open = TRUE
+    end
+
+    var idle = Larre.Idle;
+    db.Setting = currState
+    if idle != 1
+        yield
+        j main
+    end
+
+    var destStation = LarreDestMem.Setting
+    var currOp = LarreOpMem.Setting
+
+    # Check for plant request
+    if currOp == OPERATION_PLANT
+        if currState == STATE_IDLE
+            currState = STATE_PLANT_GET_SEEDS
+            Larre.Setting = SEED_INPUT_STATION
+            yield
+            j main
+        end
+    end
+
+    # Check for harvest request
+    if currOp == OPERATION_HARVEST
+        if currState == STATE_IDLE
+            currState = STATE_MOVE_TO_HARVEST
+            Larre.Setting = destStation
+            yield
+            j main
+        end
+    end
+
+    if currState == STATE_PLANT_GET_SEEDS
+        Larre.Activate = 1
+        currState = STATE_MOVE_TO_PLANT
+        sleep 2
+        yield
+        j main
+    end
+    if currState == STATE_MOVE_TO_PLANT
+        Larre.Setting = destStation
+        currState = STATE_PLANTING
+        sleep 1
+        yield
+        j main
+    end
+    if currState == STATE_PLANTING
+        Larre.Activate = 1
+        currState = STATE_MOVE_TO_OUTPUT
+        sleep 2
+        yield
+        j main
+    end
+    if currState == STATE_MOVE_TO_OUTPUT
+        Larre.Setting = OUTPUT_STATION
+        currState = STATE_OUTPUT
+        sleep 1
+        yield
+        j main
+    end
+    if currState == STATE_OUTPUT
+        Larre.Activate = 1
+        sleep 2
+        currState = STATE_IDLE
+        yield
+        j main
+    end
+
+    if currState == STATE_MOVE_TO_HARVEST
+        currState = STATE_HARVESTING
+        sleep 2
+        yield
+        j main
+    end
+
+    if currState == STATE_HARVESTING
+        Larre.Activate = 1
+        currState = STATE_MOVE_TO_OUTPUT
+        sleep 2
+        yield
+        j main
+    end
+
+    # Go home on IDLE
+    if currState == STATE_IDLE
+        Larre.Setting = HOME_STATION
+        yield
+        j main
+    end
+    yield
+j main

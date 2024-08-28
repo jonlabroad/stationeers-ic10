@@ -1,0 +1,48 @@
+alias OutputVent d0
+alias GasSensor d1
+alias CarbonDioxideSource d2
+
+const ENABLE = 1
+const DISABLE = 0
+
+const TARGET_PRESSURE_LOW = 55
+const TARGET_PRESSURE_HIGH = 85
+
+const TARGET_CO2_RATIO_HIGH = 0.10
+const TARGET_CO2_RATIO_LOW = 0.02
+
+const INWARD = 1
+const OUTWARD = 0
+
+OutputVent.On = DISABLE
+OutputVent.Mode = OUTWARD
+CarbonDioxideSource.On = DISABLE
+
+var ventOn = DISABLE
+var carbonDioxideOn = DISABLE
+
+main:
+    var currentPressure = GasSensor.Pressure
+    var co2Ratio = GasSensor.RatioCarbonDioxide
+    
+    if currentPressure < TARGET_PRESSURE_LOW
+        ventOn = ENABLE
+    end
+
+    if ventOn == ENABLE && currentPressure >= TARGET_PRESSURE_HIGH
+        ventOn = DISABLE
+    end
+
+    if co2Ratio < TARGET_CO2_RATIO_LOW
+        carbonDioxideOn = ENABLE
+    end
+
+    if carbonDioxideOn == ENABLE && co2Ratio > TARGET_CO2_RATIO_HIGH
+        carbonDioxideOn = DISABLE
+    end
+
+    OutputVent.On = ventOn
+    CarbonDioxideSource.On = carbonDioxideOn
+    db.Setting = co2Ratio
+    yield
+j main

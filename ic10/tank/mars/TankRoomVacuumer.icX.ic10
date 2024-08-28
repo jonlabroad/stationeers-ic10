@@ -1,0 +1,12 @@
+s d1 On 0
+main:
+l r0 d0 Pressure
+sgt r15 r0 0.0001
+beqz r15 if0else
+s d1 On 1
+j if0exit
+if0else:
+s d1 On 0
+if0exit:
+yield
+j main
