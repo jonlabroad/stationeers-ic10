@@ -1,6 +1,7 @@
 alias OutputVent d0
 alias GasSensor d1
 alias CarbonDioxideSource d2
+alias DepressurizeVent d3
 
 const ENABLE = 1
 const DISABLE = 0
@@ -8,8 +9,11 @@ const DISABLE = 0
 const TARGET_PRESSURE_LOW = 55
 const TARGET_PRESSURE_HIGH = 85
 
-const TARGET_CO2_RATIO_HIGH = 0.10
-const TARGET_CO2_RATIO_LOW = 0.02
+const TARGET_DEPRESSURIZE_HIGH = 95
+const TARGET_DEPRESSURIZE_LOW = 75
+
+const TARGET_CO2_RATIO_HIGH = 0.15
+const TARGET_CO2_RATIO_LOW = 0.05
 
 const INWARD = 1
 const OUTWARD = 0
@@ -17,8 +21,10 @@ const OUTWARD = 0
 OutputVent.On = DISABLE
 OutputVent.Mode = OUTWARD
 CarbonDioxideSource.On = DISABLE
+DepressurizeVent.On = DISABLE
 
 var ventOn = DISABLE
+var depressurize = DISABLE
 var carbonDioxideOn = DISABLE
 
 main:
@@ -33,6 +39,14 @@ main:
         ventOn = DISABLE
     end
 
+    if currentPressure > TARGET_DEPRESSURIZE_HIGH
+        depressurize = ENABLE
+    end
+
+    if depressurize == ENABLE && currentPressure < TARGET_DEPRESSURIZE_LOW
+        depressurize = DISABLE
+    end
+
     if co2Ratio < TARGET_CO2_RATIO_LOW
         carbonDioxideOn = ENABLE
     end
@@ -43,6 +57,7 @@ main:
 
     OutputVent.On = ventOn
     CarbonDioxideSource.On = carbonDioxideOn
+    DepressurizeVent.On = depressurize
     db.Setting = co2Ratio
     yield
 j main

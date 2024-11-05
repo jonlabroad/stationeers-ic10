@@ -1,0 +1,38 @@
+alias MedSat d0
+alias AzDial d1
+alias ElDial d2
+alias LargeSat d3
+alias MiscDisplay d4
+alias Switch d5
+
+const DISABLE = 0
+const ENABLE = 1
+
+MedSat.On = ENABLE
+LargeSat.On = ENABLE
+
+main:
+    var satSel = Switch.Open
+    var azSetting = AzDial.Setting
+    var elSetting = ElDial.Setting
+
+    var strength = 0
+    if satSel == 0
+        MedSat.Horizontal = azSetting
+        MedSat.Vertical = elSetting
+        strength = MedSat.SignalStrength
+    else
+        LargeSat.Horizontal = azSetting
+        LargeSat.Vertical = elSetting
+        strength = LargeSat.SignalStrength
+    end
+    
+    var test = LargeSat.Horizontal
+
+    if strength >= 0
+        MiscDisplay.Setting = strength
+    end
+    db.Setting = test
+
+    yield
+j main

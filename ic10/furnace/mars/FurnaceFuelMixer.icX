@@ -1,7 +1,6 @@
 alias Mixer d0
 alias MixAnalyzer d1
 alias FuelPressureRegulator d2
-alias FuelAnalyzer d3
 
 const ENABLE = 1
 const DISABLE = 0

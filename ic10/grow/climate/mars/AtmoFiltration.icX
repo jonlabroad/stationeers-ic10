@@ -1,0 +1,26 @@
+alias Analyzer d0
+alias Filtration d1
+
+const ENABLE = 1
+const DISABLE = 0
+
+const MIN_POLLUTANT_RATIO = 0.05
+const MAX_POLLUTANT_RATIO = 0.6
+
+Analyzer.On = ENABLE
+Filtration.On = DISABLE
+
+var filterOn = DISABLE
+
+main:
+    var ratioPollutants = Analyzer.RatioPollutant
+    if ratioPollutants > MAX_POLLUTANT_RATIO
+        filterOn = ENABLE
+    end
+    if filterOn == ENABLE && ratioPollutants < MIN_POLLUTANT_RATIO
+        filterOn = DISABLE
+    end
+
+    Filtration.On = filterOn
+    yield
+j main

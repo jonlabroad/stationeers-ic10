@@ -1,0 +1,39 @@
+alias IntakeVent d0
+alias Analyzer d1
+
+const ENABLE = 1
+const DISABLE = 0
+
+const TARGET_PRESSURE_LOW = 1000
+const TARGET_PRESSURE_HIGH = 1500
+
+const INWARD = 1
+const OUTWARD = 0
+
+IntakeVent.On = DISABLE
+IntakeVent.Mode = INWARD
+Analyzer.On = ENABLE
+
+var intakeVentOn = DISABLE
+
+main:
+    var currentPressure = Analyzer.Pressure
+    var co2Liquid = Analyzer.RatioLiquidCarbonDioxide
+    var pollutantLiquid = Analyzer.RatioLiquidPollutant
+    
+    if co2Liquid > 0.001 || pollutantLiquid > 0.001
+        intakeVentOn = DISABLE
+    else
+        if currentPressure < TARGET_PRESSURE_LOW
+            intakeVentOn = ENABLE
+        end
+
+        if intakeVentOn == ENABLE && currentPressure >= TARGET_PRESSURE_HIGH
+            intakeVentOn = DISABLE
+        end
+    end
+
+    IntakeVent.On = intakeVentOn
+    db.Setting = intakeVentOn
+    yield
+j main

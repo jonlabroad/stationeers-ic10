@@ -1,0 +1,107 @@
+move r0 0
+main:
+ls r1 d3 0 Occupied
+seq r15 r1 1
+beqz r15 if0else
+s d3 Open 0
+j if0exit
+if0else:
+s d3 Open 1
+if0exit:
+l r2 d2 Idle
+s db Setting r0
+sne r15 r2 1
+beqz r15 if1exit
+yield
+j main
+if1exit:
+l r3 d0 Setting
+l r4 d1 Setting
+sne r15 r0 0
+beqz r15 if2exit
+s d4 Open 1
+if2exit:
+seq r15 r4 0
+beqz r15 if3exit
+seq r14 r0 0
+beqz r14 if4exit
+move r0 1
+s d2 Setting 2
+yield
+j main
+if4exit:
+if3exit:
+seq r15 r4 1
+beqz r15 if5exit
+seq r14 r0 0
+beqz r14 if6exit
+move r0 6
+s d2 Setting r3
+yield
+j main
+if6exit:
+if5exit:
+seq r15 r0 1
+beqz r15 if7exit
+s d2 Activate 1
+move r0 2
+sleep 2
+yield
+j main
+if7exit:
+seq r15 r0 2
+beqz r15 if8exit
+s d2 Setting r3
+move r0 3
+sleep 1
+yield
+j main
+if8exit:
+seq r15 r0 3
+beqz r15 if9exit
+s d2 Activate 1
+move r0 4
+sleep 2
+yield
+j main
+if9exit:
+seq r15 r0 4
+beqz r15 if10exit
+s d2 Setting 1
+move r0 5
+sleep 1
+yield
+j main
+if10exit:
+seq r15 r0 5
+beqz r15 if11exit
+s d2 Activate 1
+sleep 2
+move r0 0
+yield
+j main
+if11exit:
+seq r15 r0 6
+beqz r15 if12exit
+move r0 7
+sleep 2
+yield
+j main
+if12exit:
+seq r15 r0 7
+beqz r15 if13exit
+s d2 Activate 1
+move r0 4
+sleep 2
+yield
+j main
+if13exit:
+seq r15 r0 0
+beqz r15 if14exit
+s d2 Setting 0
+s d4 Open 0
+yield
+j main
+if14exit:
+yield
+j main

@@ -1,0 +1,26 @@
+s d0 On 1
+s d3 On 1
+main:
+l r0 d5 Open
+l r1 d1 Setting
+l r2 d2 Setting
+move r3 0
+seqz r15 r0
+beqz r15 if0else
+s d0 Horizontal r1
+s d0 Vertical r2
+l r3 d0 SignalStrength
+j if0exit
+if0else:
+s d3 Horizontal r1
+s d3 Vertical r2
+l r3 d3 SignalStrength
+if0exit:
+l r4 d3 Horizontal
+sgez r15 r3
+beqz r15 if1exit
+s d4 Setting r3
+if1exit:
+s db Setting r4
+yield
+j main
