@@ -1,0 +1,38 @@
+move r0 0
+move r1 0
+main:
+move r2 r1
+l r3 d1 RatioCarbonDioxideInput
+l r4 d1 TotalMolesInput
+mul r5 r3 r4
+l r6 d2 Pressure
+s db Setting r1
+seq r15 r1 0
+beqz r15 if0exit
+s d1 On 0
+move r0 0
+sgt r14 r5 3
+slt r13 r6 5000
+and r12 r14 r13
+beqz r12 if1exit
+move r2 1
+move r0 0
+if1exit:
+if0exit:
+seq r15 r1 1
+beqz r15 if2exit
+s d1 On 1
+add r0 r0 1
+slt r14 r5 0.1
+sge r13 r6 5000
+or r12 r14 r13
+beqz r12 if3exit
+sgt r11 r0 20
+beqz r11 if4exit
+move r2 0
+if4exit:
+if3exit:
+if2exit:
+move r1 r2
+yield
+j main

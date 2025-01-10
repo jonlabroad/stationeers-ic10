@@ -1,0 +1,75 @@
+s d0 On 0
+s d2 On 1
+s d3 On 0
+s d3 Mode 0
+move r0 0
+move r1 r0
+main:
+move r0 r1
+l r2 d5 Setting
+l r3 d2 Pressure
+l r4 d2 Temperature
+l r5 d2 RatioLiquidPollutant
+move r6 0
+s db Setting r0
+seq r15 r0 0
+beqz r15 if0exit
+s d0 On 0
+s d3 On 0
+sgt r14 r3 100
+beqz r14 if1else
+move r1 3
+j if1exit
+if1else:
+seq r13 r2 1
+beqz r13 if2exit
+move r1 1
+if2exit:
+if1exit:
+if0exit:
+seq r15 r0 1
+beqz r15 if3exit
+s d0 On 1
+sgt r14 r3 1000
+beqz r14 if4exit
+s d1 Activate 1
+move r1 2
+move r6 0
+if4exit:
+if3exit:
+seq r15 r0 2
+beqz r15 if5exit
+add r6 r6 1
+s d0 On 0
+seq r14 r2 0
+beqz r14 if6else
+move r1 3
+move r6 0
+j if6exit
+if6else:
+slt r13 r4 400
+sgt r12 r6 75
+and r11 r13 r12
+beqz r11 if7exit
+move r1 3
+move r6 0
+yield
+j main
+if7exit:
+sgt r13 r5 0.001
+beqz r13 if8exit
+move r1 3
+move r6 0
+if8exit:
+if6exit:
+if5exit:
+seq r15 r0 3
+beqz r15 if9exit
+s d3 On 1
+sle r14 r3 0.0001
+beqz r14 if10exit
+move r1 0
+if10exit:
+if9exit:
+yield
+j main

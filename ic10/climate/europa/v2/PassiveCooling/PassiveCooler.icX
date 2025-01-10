@@ -1,0 +1,27 @@
+alias Sensor d0
+alias Valve d1
+
+const DISABLE = 0
+const ENABLE = 1
+
+Valve.On = DISABLE
+
+const COOL_TO_TEMP = 293.15
+const TRIGGER_TEMP = 303.15
+
+var active = DISABLE
+
+main:
+    var temperature = Sensor.Temperature
+    if temperature > TRIGGER_TEMP
+        active = ENABLE
+    end
+
+    if active == ENABLE && temperature <= COOL_TO_TEMP
+        active = DISABLE
+    end
+
+    Valve.On = active
+
+    yield
+j main

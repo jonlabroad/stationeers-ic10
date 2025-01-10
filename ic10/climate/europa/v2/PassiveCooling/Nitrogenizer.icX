@@ -1,0 +1,36 @@
+alias Sensor d0
+alias Pump d1
+
+const DISABLE = 0
+const ENABLE = 1
+
+Pump.On = DISABLE
+
+const PUMP_TO_RATIO = 0.05
+const TRIGGER_RATIO = 0.02
+const MAX_PRESSURE = 95
+
+var active = DISABLE
+
+main:
+    var nitrogenRatio = Sensor.RatioNitrogen
+    var pressure = Sensor.Pressure
+
+    db.Setting = nitrogenRatio
+
+    if nitrogenRatio <= TRIGGER_RATIO && pressure < MAX_PRESSURE
+        active = ENABLE
+    end
+
+    if active == ENABLE && nitrogenRatio >= PUMP_TO_RATIO
+        active = DISABLE
+    end
+
+    if pressure >= MAX_PRESSURE
+        active = DISABLE
+    end
+
+    Pump.On = active
+
+    yield
+j main

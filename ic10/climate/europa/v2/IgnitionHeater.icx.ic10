@@ -1,0 +1,70 @@
+s d0 On 0
+s d3 On 1
+s d4 On 0
+s d5 On 0
+move r0 0
+move r1 r0
+move r2 0
+main:
+move r0 r1
+l r3 d3 Pressure
+l r4 d3 Temperature
+l r5 d2 Temperature
+s db Setting r5
+seq r15 r0 0
+beqz r15 if0exit
+s d0 On 0
+s d4 On 0
+s d5 On 0
+sgt r14 r3 100
+beqz r14 if1exit
+move r1 3
+yield
+j main
+if1exit:
+slt r14 r5 291
+beqz r14 if2exit
+move r1 1
+if2exit:
+if0exit:
+seq r15 r0 1
+beqz r15 if3exit
+s d0 On 1
+sgt r14 r3 1000
+beqz r14 if4exit
+move r1 2
+move r2 0
+if4exit:
+if3exit:
+seq r15 r0 2
+beqz r15 if5exit
+add r2 r2 1
+s d0 On 0
+s d4 On 1
+s d1 Activate 1
+sgt r14 r5 302.15
+beqz r14 if6exit
+move r1 3
+yield
+j main
+if6exit:
+slt r14 r4 420
+sgt r13 r2 50
+and r12 r14 r13
+beqz r12 if7exit
+move r1 3
+move r2 0
+if7exit:
+if5exit:
+seq r15 r0 3
+beqz r15 if8exit
+s d4 On 0
+s d1 Activate 0
+s d5 On 1
+sle r14 r3 0.00001
+beqz r14 if9exit
+move r1 0
+if9exit:
+if8exit:
+yield
+j main

@@ -1,0 +1,17 @@
+s d1 On 0
+move r0 0
+main:
+l r1 d0 Temperature
+sgt r15 r1 303.15
+beqz r15 if0exit
+move r0 1
+if0exit:
+seq r15 r0 1
+sle r14 r1 293.15
+and r13 r15 r14
+beqz r13 if1exit
+move r0 0
+if1exit:
+s d1 On r0
+yield
+j main

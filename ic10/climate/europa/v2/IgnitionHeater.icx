@@ -1,0 +1,96 @@
+alias FuelMixer d0
+alias Igniter d1
+alias GasSensor d2
+alias FurnaceAnalyzer d3
+alias OutputValve d4
+alias PurgeVent d5
+
+const DISABLE = 0
+const ENABLE = 1
+
+FuelMixer.On = DISABLE
+FurnaceAnalyzer.On = ENABLE
+OutputValve.On = DISABLE
+PurgeVent.On = DISABLE
+
+const STATE_IDLE = 0
+const STATE_FUELING = 1
+const STATE_HEATING = 2
+const STATE_PURGE = 3
+
+const TARGET_FUEL_PRESSURE = 1000
+const MIN_VOLATILE_MOLES = 1
+const TARGET_HIGH_TEMPERATURE = 302.15
+const TARGET_LOW_TEMPERATURE = 291
+
+const REFRESH_TEMPERATURE = 420
+
+var currState = STATE_IDLE
+var nextState = currState
+var numHeatTicks = 0
+
+main:
+    currState = nextState
+
+    var furnacePressure = FurnaceAnalyzer.Pressure
+    var furnaceTemp = FurnaceAnalyzer.Temperature
+    var atmoTemperature = GasSensor.Temperature
+
+    db.Setting = atmoTemperature
+
+    if (currState == STATE_IDLE)
+        FuelMixer.On = DISABLE
+        OutputValve.On = DISABLE
+        PurgeVent.On = DISABLE
+
+        # Anything left over?
+        if (furnacePressure > 100)
+            nextState = STATE_PURGE
+            yield
+            j main
+        end
+
+        if (atmoTemperature < TARGET_LOW_TEMPERATURE)
+            nextState = STATE_FUELING
+        end
+    end
+
+    if (currState == STATE_FUELING)
+        FuelMixer.On = ENABLE
+
+        if (furnacePressure > TARGET_FUEL_PRESSURE)
+            nextState = STATE_HEATING
+            numHeatTicks = 0
+        end
+    end
+
+    if (currState == STATE_HEATING)
+        numHeatTicks = numHeatTicks + 1
+        FuelMixer.On = DISABLE
+        OutputValve.On = ENABLE
+        Igniter.Activate = ENABLE
+
+        if (atmoTemperature > TARGET_HIGH_TEMPERATURE)
+            nextState = STATE_PURGE
+            yield
+            j main
+        end
+
+        if (furnaceTemp < REFRESH_TEMPERATURE && numHeatTicks > 50)
+            nextState = STATE_PURGE
+            numHeatTicks = 0
+        end
+    end
+
+    if (currState == STATE_PURGE)
+        OutputValve.On = DISABLE
+        Igniter.Activate = DISABLE
+        PurgeVent.On = ENABLE
+
+        if (furnacePressure <= 0.00001)
+            nextState = STATE_IDLE
+        end
+    end
+
+    yield
+j main

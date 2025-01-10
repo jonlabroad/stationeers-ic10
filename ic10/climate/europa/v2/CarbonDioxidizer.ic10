@@ -1,0 +1,52 @@
+alias Pump d0
+alias Sensor d1
+alias LedLight d2
+
+define DISABLE 0
+define ENABLE 1
+
+define MAX_PRESSURE 95
+define TARGET_CO2_RATIO 0.03
+define TRIGGER_THRESHOLD 0.01
+
+s Pump On DISABLE
+
+alias pumpEnable r0
+move pumpEnable DISABLE
+
+main:
+
+alias atmoPressure r1
+alias atmoRatioCO2 r2
+
+# Atmo greater than max? Turn off and end
+sge r13 atmoPressure MAX_PRESSURE
+beqz r13 if2Exit
+    move pumpEnable DISABLE
+    j setPump
+if2Exit:
+
+l atmoRatioCO2 Sensor RatioCarbonDioxide
+
+# Pump is On and Target reached?
+seq r15 pumpEnable ENABLE
+sgt r14 atmoRatioCO2 TARGET_CO2_RATIO
+and r13 r14 r15
+beqz r13 if0Exit
+    # Turn off pump
+    move pumpEnable DISABLE
+if0Exit:
+
+# Turn pump on if lower than trigger
+slt r13 atmoRatioCO2 TRIGGER_THRESHOLD
+beqz r13 if1Exit
+    move pumpEnable ENABLE
+if1Exit:
+
+ifPressureAtMaxExit:
+setPump:
+s Pump On pumpEnable
+
+endTick:
+yield
+j main
