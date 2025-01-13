@@ -1,0 +1,111 @@
+alias InputPump d0
+alias StagingAnalyzer d1
+alias TransferPump d2
+alias OutputAnalyzer d3
+alias HeatControlMem d4
+
+const DISABLE = 0
+const ENABLE = 1
+
+const LEFT = 1
+const RIGHT = 0
+
+InputPump.On = DISABLE
+InputPump.Mode = LEFT
+StagingAnalyzer.On = ENABLE
+OutputAnalyzer.On = ENABLE
+TransferPump.On = DISABLE
+HeatControlMem.Setting = DISABLE
+
+const STATE_IDLE = 0
+const STATE_STAGING = 1
+const STATE_HEATING = 2
+const STATE_TRANSFER = 3
+const STATE_PURGE = 4
+
+const MIN_HEATING_PRESSURE = 4000
+const MAX_HEATING_PRESSURE = 8000
+const MAX_STAGING_PRESSURE = 1500
+const MAX_OUTPUT_PRESSURE = 16000
+const TARGET_TEMPERATURE = 280
+
+var currState = STATE_IDLE
+
+main:
+    var nextState = currState
+    db.Setting = currState
+
+    var stagingPressure = StagingAnalyzer.Pressure
+    var stagingTemperature = StagingAnalyzer.Temperature
+    var stagingO2Liquid = StagingAnalyzer.RatioLiquidOxygen
+    var stagingO2Ratio = StagingAnalyzer.RatioOxygen
+
+    var outputPressure = OutputAnalyzer.Pressure
+
+    if (currState == STATE_IDLE)
+        TransferPump.On = DISABLE
+        InputPump.On = DISABLE
+
+        if (outputPressure < MAX_OUTPUT_PRESSURE)
+            nextState = STATE_STAGING
+        else
+            HeatControlMem.Setting = DISABLE
+        end
+    end
+
+    if (currState == STATE_STAGING)
+        HeatControlMem.Setting = ENABLE
+        InputPump.On = ENABLE
+        InputPump.Mode = LEFT
+
+        if (stagingO2Liquid > 0 || stagingPressure > MAX_STAGING_PRESSURE)
+            nextState = STATE_HEATING
+        end
+    end
+
+    if (currState == STATE_HEATING)
+        HeatControlMem.Setting = ENABLE
+        
+        # Keep bringing in more air as we are heating, up to a max
+        var ventOn = DISABLE
+        if stagingO2Liquid <= 0 && stagingPressure < MAX_HEATING_PRESSURE
+            ventOn = ENABLE
+        end
+        InputPump.On = ventOn
+        InputPump.Mode = LEFT
+
+        if stagingPressure > MIN_HEATING_PRESSURE
+            if (stagingTemperature > TARGET_TEMPERATURE && stagingO2Liquid <= 0)
+                nextState = STATE_TRANSFER
+            end
+        end
+    end
+
+    if (currState == STATE_TRANSFER)
+        InputPump.On = DISABLE
+        if stagingO2Ratio < 1.0
+            nextState = STATE_PURGE
+        else
+            TransferPump.On = ENABLE
+
+            if (stagingPressure < 250)
+                nextState = STATE_IDLE
+            end
+        end
+    end
+
+    if (currState == STATE_PURGE)
+        InputPump.Mode = RIGHT
+        InputPump.On = ENABLE
+
+        if (stagingPressure <= 0)
+            InputPump.On = DISABLE
+            nextState = STATE_IDLE
+            sleep 30
+        end
+    end
+
+    currState = nextState
+
+    yield
+j main

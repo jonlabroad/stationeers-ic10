@@ -1,0 +1,53 @@
+l r0 d1 PrefabHash
+s d2 On 1
+s d4 On 1
+s d3 On 0
+sb r0 On 0
+move r1 0
+main:
+move r2 r1
+s db Setting r1
+l r3 d2 Pressure
+l r4 d2 Temperature
+l r5 d2 RatioLiquidOxygen
+l r6 d4 Pressure
+seq r15 r1 0
+beqz r15 if0exit
+s d3 On 0
+sb r0 On 0
+s d0 On 0
+slt r14 r6 40000
+beqz r14 if1exit
+move r2 1
+if1exit:
+if0exit:
+seq r15 r1 1
+beqz r15 if2exit
+sb r0 On 1
+s d0 On 1
+sgtz r14 r5
+beqz r14 if3exit
+move r2 2
+if3exit:
+if2exit:
+seq r15 r1 2
+beqz r15 if4exit
+s d0 On 0
+sb r0 On 1
+sgt r14 r4 280
+beqz r14 if5exit
+move r2 3
+if5exit:
+if4exit:
+seq r15 r1 3
+beqz r15 if6exit
+sb r0 On 0
+s d3 On 1
+slt r14 r3 250
+beqz r14 if7exit
+move r2 0
+if7exit:
+if6exit:
+move r1 r2
+yield
+j main

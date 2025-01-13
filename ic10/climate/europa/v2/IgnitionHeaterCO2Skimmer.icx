@@ -1,0 +1,54 @@
+alias FurnaceAnalyzer d0
+alias Filtration d1
+alias Tank d2
+
+const DISABLE = 0
+const ENABLE = 1
+
+const STATE_IDLE = 0
+const STATE_FILTER = 1
+
+const MAX_TANK_PRESSURE = 5000
+const CO2_MIN_THRESHOLD_MOLES = 3
+const CO2_TURN_OFF_THRESHOLD_MOLES = 0.1
+const MIN_ON_TICKS = 20
+
+var numOnTicks = 0
+
+var currState = STATE_IDLE
+
+main:
+    var nextState = currState
+
+    var inputRatioCO2 = Filtration.RatioCarbonDioxideInput
+    var totalMoles = Filtration.TotalMolesInput
+    var co2Moles = inputRatioCO2 * totalMoles
+    var tankPressure = Tank.Pressure
+
+    db.Setting = currState
+
+    if (currState == STATE_IDLE)
+        Filtration.On = DISABLE
+        numOnTicks = 0
+
+        if (co2Moles > CO2_MIN_THRESHOLD_MOLES && tankPressure < MAX_TANK_PRESSURE)
+            nextState = STATE_FILTER
+            numOnTicks = 0
+        end
+    end
+
+    if (currState == STATE_FILTER)
+        Filtration.On = ENABLE
+        numOnTicks = numOnTicks + 1
+
+        if (co2Moles < CO2_TURN_OFF_THRESHOLD_MOLES || tankPressure >= MAX_TANK_PRESSURE)
+            if numOnTicks > MIN_ON_TICKS
+                nextState = STATE_IDLE
+            end
+        end
+    end
+
+    currState = nextState
+
+    yield
+j main

@@ -1,0 +1,76 @@
+alias InputVent d0
+alias PipeHeater d1
+alias StagingAnalyzer d2
+alias TransferPump d3
+alias SupplyAnalyzer d4
+
+const DISABLE = 0
+const ENABLE = 1
+
+var HeaterHash = PipeHeater.PrefabHash
+StagingAnalyzer.On = ENABLE
+SupplyAnalyzer.On = ENABLE
+TransferPump.On = DISABLE
+d(HeaterHash).On = DISABLE
+
+const STATE_IDLE = 0
+const STATE_STAGING = 1
+const STATE_HEATING = 2
+const STATE_TRANSFER = 3
+
+const MAX_SUPPLY_PRESSURE = 40000
+const TARGET_TEMPERATURE = 280
+
+var currState = STATE_IDLE
+
+main:
+    var nextState = currState
+    db.Setting = currState
+
+    var stagingPressure = StagingAnalyzer.Pressure
+    var stagingTemperature = StagingAnalyzer.Temperature
+    var stagingO2Liquid = StagingAnalyzer.RatioLiquidOxygen
+
+    var supplyPressure = SupplyAnalyzer.Pressure
+
+    if (currState == STATE_IDLE)
+        TransferPump.On = DISABLE
+        d(HeaterHash).On = DISABLE
+        InputVent.On = DISABLE
+
+        if (supplyPressure < MAX_SUPPLY_PRESSURE)
+            nextState = STATE_STAGING
+        end
+    end
+
+    if (currState == STATE_STAGING)
+        d(HeaterHash).On = ENABLE
+        InputVent.On = ENABLE
+
+        if (stagingO2Liquid > 0)
+            nextState = STATE_HEATING
+        end
+    end
+
+    if (currState == STATE_HEATING)
+        InputVent.On = DISABLE
+        d(HeaterHash).On = ENABLE
+
+        if (stagingTemperature > TARGET_TEMPERATURE)
+            nextState = STATE_TRANSFER
+        end
+    end
+
+    if (currState == STATE_TRANSFER)
+        d(HeaterHash).On = DISABLE
+        TransferPump.On = ENABLE
+
+        if (stagingPressure < 250)
+            nextState = STATE_IDLE
+        end
+    end
+
+    currState = nextState
+
+    yield
+j main

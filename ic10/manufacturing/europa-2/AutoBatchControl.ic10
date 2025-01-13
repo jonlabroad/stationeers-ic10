@@ -1,0 +1,38 @@
+# Automatically stop at a certain number of items created
+
+define BATCH_SIZE 50
+define STACK_SIZE 4
+
+alias loopIndex r0
+
+push HASH("StructureAutolathe")
+push HASH("StructureHydraulicPipeBender")
+push HASH("StructureElectronicsPrinter")
+push HASH("StructureToolManufactory")
+
+move loopIndex 0
+main:
+
+alias currDeviceHash r1
+get currDeviceHash db loopIndex
+
+alias currActivated r2
+lb currActivated currDeviceHash Activate Maximum
+beqz currActivated endIteration
+    # Assumming that it just started
+    sb currDeviceHash ClearMemory 1
+    activatedLoop:
+        yield
+        s db Setting r3
+        lb r3 currDeviceHash ExportCount Maximum
+        lb currActivated currDeviceHash Activate Maximum
+        beqz currActivated endIteration
+    blt r3 50 activatedLoop
+    # Shut it down
+    sb currDeviceHash Activate 0    
+
+endIteration:
+add loopIndex loopIndex 1
+mod loopIndex loopIndex STACK_SIZE
+yield
+j main

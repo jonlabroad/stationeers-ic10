@@ -1,0 +1,97 @@
+alias FuelMixer d0
+alias Igniter d1
+alias GasSensor d2
+alias FurnaceAnalyzer d3
+alias PurgeVent d4
+
+const DISABLE = 0
+const ENABLE = 1
+
+FuelMixer.On = DISABLE
+FurnaceAnalyzer.On = ENABLE
+PurgeVent.On = DISABLE
+
+const STATE_IDLE = 0
+const STATE_FUELING = 1
+const STATE_HEATING = 2
+const STATE_PURGE = 3
+
+const TARGET_FUEL_PRESSURE = 50
+const MIN_VOLATILE_MOLES = 1
+const TARGET_HIGH_TEMPERATURE = 300
+const TARGET_LOW_TEMPERATURE = 297.15
+
+const REFRESH_TEMPERATURE = 420
+
+var currState = STATE_IDLE
+var nextState = currState
+var numHeatTicks = 0
+
+main:
+    currState = nextState
+
+    var furnacePressure = FurnaceAnalyzer.Pressure
+    var furnaceTemp = FurnaceAnalyzer.Temperature
+    var atmoTemperature = GasSensor.Temperature
+
+    db.Setting = currState
+
+    if (currState == STATE_IDLE)
+        FuelMixer.On = DISABLE
+        PurgeVent.On = DISABLE
+
+        # Anything left over?
+        if (furnacePressure > 100)
+            nextState = STATE_PURGE
+            yield
+            j main
+        end
+
+        if (atmoTemperature < TARGET_LOW_TEMPERATURE)
+            nextState = STATE_FUELING
+        end
+    end
+
+    if (currState == STATE_FUELING)
+        FuelMixer.On = ENABLE
+
+        if (furnacePressure > TARGET_FUEL_PRESSURE)
+            nextState = STATE_HEATING
+            numHeatTicks = 0
+        end
+    end
+
+    if (currState == STATE_HEATING)
+        numHeatTicks = numHeatTicks + 1
+        FuelMixer.On = DISABLE
+        Igniter.Activate = ENABLE
+
+        if (atmoTemperature > TARGET_HIGH_TEMPERATURE)
+            nextState = STATE_PURGE
+            yield
+            j main
+        end
+
+        if furnacePressure > 12000
+            PurgeVent.On = ENABLE
+        else
+            PurgeVent.On = DISABLE
+        end
+
+        if (furnaceTemp < REFRESH_TEMPERATURE && numHeatTicks > 5)
+            nextState = STATE_PURGE
+            numHeatTicks = 0
+        end
+    end
+
+    if (currState == STATE_PURGE)
+        Igniter.Activate = DISABLE
+        PurgeVent.On = ENABLE
+
+        if (furnacePressure <= 0.00001)
+            nextState = STATE_IDLE
+        end
+    end
+
+    yield
+j main

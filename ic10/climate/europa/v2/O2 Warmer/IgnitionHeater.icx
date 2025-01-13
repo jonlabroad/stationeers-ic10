@@ -1,0 +1,100 @@
+alias FuelInputPump d0
+alias Igniter d1
+alias FurnaceAnalyzer d2
+alias PurgeVent d3
+
+alias ControlMem d5
+
+const DISABLE = 0
+const ENABLE = 1
+
+const OUTWARD = 0
+const INWARD = 1
+
+FuelInputPump.On = DISABLE
+FurnaceAnalyzer.On = ENABLE
+PurgeVent.On = DISABLE
+PurgeVent.Mode = OUTWARD
+
+const STATE_IDLE = 0
+const STATE_FUELING = 1
+const STATE_HEATING = 2
+const STATE_PURGE = 3
+
+const TARGET_FUEL_PRESSURE = 1000
+const REFRESH_TEMPERATURE = 400
+
+const CONTROL_OFF = 0
+const CONTROL_HEAT = 1
+
+var currState = STATE_IDLE
+var nextState = currState
+
+main:
+    currState = nextState
+
+    var controlVal = ControlMem.Setting
+    var furnacePressure = FurnaceAnalyzer.Pressure
+    var furnaceTemp = FurnaceAnalyzer.Temperature
+    var furnaceLiquidPollutant = FurnaceAnalyzer.RatioLiquidPollutant
+    var numHeatTicks = 0
+
+    db.Setting = currState
+
+    if (currState == STATE_IDLE)
+        FuelInputPump.On = DISABLE
+        PurgeVent.On = DISABLE
+
+        # Anything left over?
+        if (furnacePressure > 100)
+            nextState = STATE_PURGE
+        else
+            if (controlVal == CONTROL_HEAT)
+                nextState = STATE_FUELING
+            end
+        end
+    end
+
+    if (currState == STATE_FUELING)
+        FuelInputPump.On = ENABLE
+
+        if (furnacePressure > TARGET_FUEL_PRESSURE)
+            Igniter.Activate = ENABLE
+            nextState = STATE_HEATING
+            numHeatTicks = 0
+        end
+    end
+
+    if (currState == STATE_HEATING)
+        numHeatTicks = numHeatTicks + 1
+        FuelInputPump.On = DISABLE
+
+        if (controlVal == CONTROL_OFF)
+            nextState = STATE_PURGE
+            numHeatTicks = 0
+        else
+            # Temp too low?
+            if (furnaceTemp < REFRESH_TEMPERATURE && numHeatTicks > 75)
+                nextState = STATE_PURGE
+                numHeatTicks = 0
+                yield
+                j main
+            end
+            # Liquid pollutant present?
+            if (furnaceLiquidPollutant > 0.001)
+                nextState = STATE_PURGE
+                numHeatTicks = 0
+            end
+        end
+    end
+
+    if (currState == STATE_PURGE)
+        PurgeVent.On = ENABLE
+
+        if (furnacePressure <= 0.0001)
+            nextState = STATE_IDLE
+        end
+    end
+
+    yield
+j main

@@ -1,0 +1,90 @@
+s d0 On 0
+s d0 Mode 1
+s d1 On 1
+s d3 On 1
+s d2 On 0
+s d4 Setting 0
+move r0 0
+main:
+move r1 r0
+s db Setting r0
+l r2 d1 Pressure
+l r3 d1 Temperature
+l r4 d1 RatioLiquidOxygen
+l r5 d1 RatioOxygen
+l r6 d3 Pressure
+seq r15 r0 0
+beqz r15 if0exit
+s d2 On 0
+s d0 On 0
+slt r14 r6 16000
+beqz r14 if1else
+move r1 1
+j if1exit
+if1else:
+s d4 Setting 0
+if1exit:
+if0exit:
+seq r15 r0 1
+beqz r15 if2exit
+s d4 Setting 1
+s d0 On 1
+s d0 Mode 1
+sgtz r14 r4
+sgt r13 r2 1500
+or r12 r14 r13
+beqz r12 if3exit
+move r1 2
+if3exit:
+if2exit:
+seq r15 r0 2
+beqz r15 if4exit
+s d4 Setting 1
+move r7 0
+slez r14 r4
+slt r13 r2 8000
+and r12 r14 r13
+beqz r12 if5exit
+move r7 1
+if5exit:
+s d0 On r7
+s d0 Mode 1
+sgt r14 r2 4000
+beqz r14 if6exit
+sgt r13 r3 280
+slez r12 r4
+and r11 r13 r12
+beqz r11 if7exit
+move r1 3
+if7exit:
+if6exit:
+if4exit:
+seq r15 r0 3
+beqz r15 if8exit
+s d0 On 0
+slt r14 r5 1.0
+beqz r14 if9else
+move r1 4
+j if9exit
+if9else:
+s d2 On 1
+slt r13 r2 250
+beqz r13 if10exit
+move r1 0
+if10exit:
+if9exit:
+if8exit:
+seq r15 r0 4
+beqz r15 if11exit
+s d0 Mode 0
+s d0 On 1
+slez r14 r2
+beqz r14 if12exit
+s d0 On 0
+move r1 0
+sleep 30
+if12exit:
+if11exit:
+move r0 r1
+yield
+j main

@@ -1,0 +1,137 @@
+alias OreInputValve d0
+alias Furnace d1
+alias AtmoPurgeVent d2
+
+const DISABLE = 0
+const ENABLE = 1
+
+const TRUE = 1
+const FALSE = 0
+
+Furnace.On = ENABLE
+OreInputValve.On = ENABLE
+
+const STATE_IDLE = 0
+const STATE_FUELING = 1
+const STATE_IGNITION = 2
+const STATE_HEATING = 3
+const STATE_READY = 4
+const STATE_LOADING = 5
+const STATE_SMELTING = 6
+const STATE_PURGE = 7
+
+const MIN_SMELTING_PRESSURE = 4000
+const MAX_SMELTING_PRESSURE = 20000
+
+const MIN_SMELTING_TEMP = 1000
+
+const NUM_INIT_FUEL_TICKS = 50
+const INIT_FUEL_PRESSURE = 600
+const NO_ORE_TIMEOUT_TICKS = 100
+
+const IMPORT_SLOT = 0
+const EXPORT_SLOT = 1
+
+var currState = STATE_IDLE
+var nextState = currState
+
+var numFuelingTicks = 0
+var numTicksWithoutOre = 0
+
+main:
+    currState = nextState
+
+    var furnacePressure = Furnace.Pressure
+    var furnaceTemp = Furnace.Temperature
+    var orePresent = OreInputValve.slot(0).Occupied
+
+    var furnaceOut = Furnace.SettingOutput
+    if furnacePressure > MAX_SMELTING_PRESSURE
+        furnaceOut = 10
+    end
+    Furnace.SettingOutput = furnaceOut
+
+    db.Setting = currState
+
+    if (currState == STATE_IDLE)
+        Furnace.Open = FALSE
+        Furnace.On = ENABLE
+        Furnace.SettingOutput = 0
+        Furnace.SettingInput = 0
+        Furnace.Open = DISABLE
+        AtmoPurgeVent.On = DISABLE
+
+        if (orePresent > 0)
+            nextState = STATE_FUELING
+            #numFuelingTicks = 0
+        end
+    end
+
+    if (currState == STATE_FUELING)
+        Furnace.SettingInput = 80
+        #numFuelingTicks = numFuelingTicks + 1
+        if (furnacePressure >= INIT_FUEL_PRESSURE)
+            Furnace.SettingInput = 0
+            nextState = STATE_IGNITION
+            #numFuelingTicks = 0
+        end
+    end
+
+    if (currState == STATE_IGNITION)
+        Furnace.Activate = ENABLE
+        nextState = STATE_HEATING
+    end
+
+    if (currState == STATE_HEATING)
+        # Just wait for the correct params
+        if furnacePressure > MIN_SMELTING_PRESSURE && furnaceTemp > MIN_SMELTING_TEMP
+            nextState = STATE_READY
+        end
+    end
+
+    if (currState == STATE_READY)
+        Furnace.Open = FALSE
+        Furnace.SettingOutput = 0
+        if orePresent > 0
+            numTicksWithoutOre = 0
+            OreInputValve.Open = ENABLE
+            nextState = STATE_LOADING
+        else
+            numTicksWithoutOre = numTicksWithoutOre + 1
+            if numTicksWithoutOre >= NO_ORE_TIMEOUT_TICKS
+                nextState = STATE_PURGE
+            end
+        end
+    end
+
+    if (currState == STATE_LOADING)
+        Furnace.Open = FALSE
+        var importSlotOccupied = Furnace.slot(IMPORT_SLOT).Occupied
+        var smeltable = Furnace.Mode
+        if importSlotOccupied == FALSE && smeltable == TRUE
+            nextState = STATE_SMELTING
+        end
+    end
+
+    if currState == STATE_SMELTING
+        Furnace.Open = TRUE
+        var numReagents = Furnace.Reagents
+        var exportOccupied = Furnace.slot(EXPORT_SLOT).Occupied
+        if numReagents == 0 && exportOccupied == FALSE
+            nextState = STATE_READY
+            numTicksWithoutOre = 0
+        end    
+    end
+
+    if (currState == STATE_PURGE)
+        Furnace.Open = FALSE
+        Furnace.SettingInput = 0
+        Furnace.SettingOutput = 100
+        
+        if (furnacePressure <= 100)
+            nextState = STATE_IDLE
+        end
+    end
+
+    yield
+j main
