@@ -1,0 +1,39 @@
+alias GasMixer d0
+alias PressureRegulator d1
+alias Analyzer d2
+alias MixedGasPipeAnalyzer d3
+
+define ENABLED 1
+define DISABLED 0
+
+define STATE_ON 0
+define STATE_OPEN 1
+
+define DESIRED_PRESSURE 4000
+
+s GasMixer On DISABLED
+s PressureRegulator On DISABLED
+s Analyzer On ENABLED
+s MixedGasPipeAnalyzer On ENABLED
+
+main:
+    alias tankPressure r0
+    alias mixedGasPressure r1
+    l tankPressure Analyzer Pressure
+    l mixedGasPressure MixedGasPipeAnalyzer Pressure
+    bge tankPressure DESIRED_PRESSURE turnOff
+        bge mixedGasPressure 10000 regulatorOn
+            s GasMixer On ENABLED
+        
+        regulatorOn:
+        PressureRegulator On ENABLED
+        j endStep
+    
+    turnOff:
+        s GasMixer On DISABLED
+        s PressureRegulator On DISABLED
+        j endStep
+
+    endStep:
+    yield
+j main

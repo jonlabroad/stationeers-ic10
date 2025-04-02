@@ -1,0 +1,29 @@
+alias DaylightSensor d0
+alias SolarPanel1 d1
+alias SolarPanelHeavy d2
+var SOLAR_HASH = d1.PrefabHash
+var SOLAR_HEAVY_HASH = d2.PrefabHash
+
+var vertical = 90
+var horizontal = 0
+
+main:
+    var verticalReading = DaylightSensor.Vertical
+    var horizontalReading = DaylightSensor.Horizontal
+    db.Setting = horizontalReading
+
+#    if verticalReading > 0 && verticalReading < 90
+#        vertical = 90 - verticalReading
+#        horizontal = horizontalReading - 90
+#    end
+    
+    #vertical = verticalReading
+    vertical = 90 - verticalReading
+    horizontal = horizontalReading
+
+    d(SOLAR_HASH).Vertical = vertical
+    d(SOLAR_HASH).Horizontal = horizontal
+    d(SOLAR_HEAVY_HASH).Vertical = vertical
+    d(SOLAR_HEAVY_HASH).Horizontal = horizontal
+    yield
+j main

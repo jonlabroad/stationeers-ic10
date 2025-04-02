@@ -1,0 +1,47 @@
+alias Sorter d0
+
+define ENABLE 1
+define DISABLE 0
+
+define TRUE 1
+define FALSE 0
+
+define SORT_UNSET -1
+define SORT_STRAIGHT 0
+define SORT_SIDE 1
+
+define IMPORT_SLOT 0
+
+define INGOT_CLASS 19
+
+s Sorter On ENABLE
+s Sorter Mode 2 # Logic mode
+s Sorter Output SORT_UNSET
+
+main:
+
+alias isOccupied r0
+alias currentItemClass r1
+ls isOccupied Sorter IMPORT_SLOT Occupied
+beqz isOccupied endProcessing
+
+# There is something in the slot
+ls currentItemClass Sorter IMPORT_SLOT Class
+s db Setting currentItemClass
+
+beq currentItemClass INGOT_CLASS isAMatch
+
+# No match
+j passItemThrough
+
+isAMatch:
+s Sorter Output SORT_STRAIGHT
+j endProcessing
+
+passItemThrough:
+s Sorter Output SORT_SIDE
+j endProcessing
+
+endProcessing:
+yield
+j main

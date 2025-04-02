@@ -28,6 +28,7 @@ WarningLight.On = DISABLED
 
 main:
 	sleepTime = 0
+	db.Setting = currState
 	var currRpm = Tumbler.Rpm
 	var currStress = Tumbler.Stress
 

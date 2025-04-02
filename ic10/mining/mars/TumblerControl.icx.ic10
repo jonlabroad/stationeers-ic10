@@ -6,6 +6,7 @@ move r3 0
 s d1 On 0
 main:
 move r2 0
+s db Setting r3
 l r4 d0 Rpm
 l r5 d0 Stress
 sge r15 r0 100

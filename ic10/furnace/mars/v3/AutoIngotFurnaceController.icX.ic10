@@ -1,0 +1,109 @@
+s d1 On 1
+s d0 On 1
+move r0 0
+move r1 r0
+move r2 0
+move r3 0
+main:
+move r0 r1
+l r4 d1 Pressure
+l r5 d1 Temperature
+ls r6 d0 0 Occupied
+l r7 d1 SettingOutput
+sgt r15 r4 20000
+beqz r15 if0exit
+move r7 10
+if0exit:
+s d1 SettingOutput r7
+s db Setting r0
+seq r15 r0 0
+beqz r15 if1exit
+s d1 Open 0
+s d1 On 1
+s d1 SettingOutput 0
+s d1 SettingInput 0
+s d1 Open 0
+s d2 On 0
+sgtz r14 r6
+beqz r14 if2exit
+move r1 1
+if2exit:
+if1exit:
+seq r15 r0 1
+beqz r15 if3exit
+s d1 SettingInput 80
+sge r14 r4 600
+beqz r14 if4exit
+s d1 SettingInput 0
+move r1 2
+if4exit:
+if3exit:
+seq r15 r0 2
+beqz r15 if5exit
+s d1 Activate 1
+move r1 3
+if5exit:
+seq r15 r0 3
+beqz r15 if6exit
+sgt r14 r4 4000
+sgt r13 r5 1000
+and r12 r14 r13
+beqz r12 if7exit
+move r1 4
+if7exit:
+if6exit:
+seq r15 r0 4
+beqz r15 if8exit
+s d1 Open 0
+s d1 SettingOutput 0
+sgtz r14 r6
+beqz r14 if9else
+move r3 0
+s d0 Open 1
+move r1 5
+j if9exit
+if9else:
+add r3 r3 1
+sge r13 r3 100
+beqz r13 if10exit
+move r1 7
+if10exit:
+if9exit:
+if8exit:
+seq r15 r0 5
+beqz r15 if11exit
+s d1 Open 0
+ls r8 d1 0 Occupied
+l r9 d1 Mode
+seq r14 r8 0
+seq r13 r9 1
+and r12 r14 r13
+beqz r12 if12exit
+move r1 6
+if12exit:
+if11exit:
+seq r15 r0 6
+beqz r15 if13exit
+s d1 Open 1
+l r10 d1 Reagents
+ls r11 d1 1 Occupied
+seqz r14 r10
+seq r13 r11 0
+and r12 r14 r13
+beqz r12 if14exit
+move r1 4
+move r3 0
+if14exit:
+if13exit:
+seq r15 r0 7
+beqz r15 if15exit
+s d1 Open 0
+s d1 SettingInput 0
+s d1 SettingOutput 100
+sle r14 r4 100
+beqz r14 if16exit
+move r1 0
+if16exit:
+if15exit:
+yield
+j main

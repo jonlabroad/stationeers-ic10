@@ -1,0 +1,16 @@
+l r0 d1 PrefabHash
+l r1 d2 PrefabHash
+move r2 90
+move r3 0
+main:
+l r4 d0 Vertical
+l r5 d0 Horizontal
+s db Setting r5
+sub r2 90 r4
+move r3 r5
+sb r0 Vertical r2
+sb r0 Horizontal r3
+sb r1 Vertical r2
+sb r1 Horizontal r3
+yield
+j main
