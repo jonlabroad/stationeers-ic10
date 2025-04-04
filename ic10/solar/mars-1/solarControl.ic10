@@ -1,0 +1,38 @@
+alias DaylightSensorDev d0
+alias SolarPanelDev d1
+alias SolarPanelHeavyDev d2
+
+alias SolarPanelPrefabHash r0
+alias SolarPanelHeavyPrefabHash r1
+
+l SolarPanelPrefabHash SolarPanelDev PrefabHash
+l SolarPanelHeavyPrefabHash SolarPanelHeavyDev PrefabHash
+
+alias PanelVertical r2
+alias PanelHorizontal r3
+move PanelVertical 90
+move PanelHorizontal 0
+
+main:
+# Read vertical and horizontal values from the daylight sensor
+alias VerticalReading r5
+alias HorizontalReading r6
+l VerticalReading DaylightSensorDev Vertical
+l HorizontalReading DaylightSensorDev Horizontal
+
+# Is Vertical between 0 and 90?
+sgtz r15 VerticalReading
+slt r14 VerticalReading 90
+and r13 r15 r14
+beqz r13 controlpanels
+# Correct the vertical and horizontal values
+sub PanelVertical 90 VerticalReading 
+sub PanelHorizontal HorizontalReading 90
+controlpanels:
+sb SolarPanelPrefabHash Vertical PanelVertical
+sb SolarPanelPrefabHash Horizontal PanelHorizontal
+sb SolarPanelHeavyPrefabHash Vertical PanelVertical
+sb SolarPanelHeavyPrefabHash Horizontal PanelHorizontal
+
+yield
+j main

@@ -1,0 +1,28 @@
+alias DaylightSensor d0
+alias GrowLight d1
+
+define ENABLE 1
+define DISABLE 0
+
+define TRUE 1
+define FALSE 0
+
+define MIN_SHUTOFF 150
+
+main:
+
+alias vertical r0
+l vertical DaylightSensor Vertical
+s db Setting vertical
+bgt vertical MIN_SHUTOFF shutoff
+
+s GrowLight On ENABLE
+j endProcessing
+
+shutoff:
+s GrowLight On DISABLE
+j endProcessing
+
+endProcessing:
+yield
+j main

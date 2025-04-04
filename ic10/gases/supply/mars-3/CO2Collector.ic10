@@ -1,0 +1,24 @@
+alias AtmoVent d0
+
+define ON 1
+define OFF 0
+
+define OUTWARD 0
+define INWARD 1
+
+define MAX_INPUT_PRESSURE 800
+
+s AtmoVent Mode INWARD
+s AtmoVent PressureInternal MAX_INPUT_PRESSURE
+
+main:
+
+s AtmoVent Mode INWARD
+s AtmoVent PressureInternal MAX_INPUT_PRESSURE
+s AtmoVent On ON
+
+
+
+end:
+yield
+j main
