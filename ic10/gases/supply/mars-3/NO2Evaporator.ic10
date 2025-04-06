@@ -1,0 +1,41 @@
+alias Evap d0
+alias GasAnalyzer d1
+
+define ON 1
+define OFF 0
+
+define EVAP_PRESSURE 500
+define MIN_OPERATING_TEMP 278
+define DESIRED_TANK_PRESSURE 600
+
+s Evap Setting EVAP_PRESSURE
+
+main:
+alias evapTemp r0
+l evapTemp Evap Temperature
+
+alias tankPressure r1
+l tankPressure GasAnalyzer Pressure
+
+# Tank pressure ok, turn off
+bge tankPressure DESIRED_TANK_PRESSURE turnoff
+
+# Chamber temp too low? Turn off
+ble evapTemp MIN_OPERATING_TEMP turnoff
+
+# No issues? Turn on
+j turnon
+
+j end
+
+turnon:
+s Evap On ON
+j end
+
+turnoff:
+s Evap On OFF
+j end
+
+end:
+yield
+j main
