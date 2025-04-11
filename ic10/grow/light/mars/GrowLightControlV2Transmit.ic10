@@ -1,4 +1,5 @@
 alias DaylightSensor d0
+alias Transmitter d1
 
 define ENABLE 1
 define DISABLE 0
@@ -12,6 +13,7 @@ main:
 
 alias vertical r0
 l vertical DaylightSensor Vertical
+s Transmitter Setting vertical
 s db Setting vertical
 bgt vertical MIN_SHUTOFF shutoff
 
