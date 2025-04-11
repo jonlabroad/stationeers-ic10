@@ -1,5 +1,5 @@
 alias DaylightSensor d0
-alias GrowLight d1
+alias Transmitter d1
 
 define ENABLE 1
 define DISABLE 0
@@ -7,20 +7,21 @@ define DISABLE 0
 define TRUE 1
 define FALSE 0
 
-define MIN_SHUTOFF 150
+define MIN_SHUTOFF 140
 
 main:
 
 alias vertical r0
 l vertical DaylightSensor Vertical
+s Transmitter Setting vertical
 s db Setting vertical
 bgt vertical MIN_SHUTOFF shutoff
 
-s GrowLight On ENABLE
+sb HASH("StructureGrowLight") On ENABLE
 j endProcessing
 
 shutoff:
-s GrowLight On DISABLE
+sb HASH("StructureGrowLight") On DISABLE
 j endProcessing
 
 endProcessing:

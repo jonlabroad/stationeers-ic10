@@ -1,0 +1,46 @@
+alias AtmoSensor d0
+alias AtmoVent d1
+alias AtmoMixer d2 # Supplies base Nitrogen and Oxygen mix
+alias CO2Injector d3 # Injects CO2 into atmo mix
+
+define ON 1
+define OFF 0
+
+define MAX_ATMO_PRESSURE 95
+define DESIRED_PRESSURE 80
+define MIN_ATMO_PRESSURE 65
+#define MIN_CO2_MOLES 50
+
+s CO2Injector Setting 1
+
+main:
+alias currVentOn r4
+l currVentOn AtmoVent On
+
+alias atmoPressure r0
+l atmoPressure AtmoSensor Pressure
+s db Setting atmoPressure
+
+# Shut down everything if over desired pressure
+bge atmoPressure DESIRED_PRESSURE alloff
+
+# Turn on base atmo if pressure is too low
+ble atmoPressure MIN_ATMO_PRESSURE allon
+
+j end
+
+alloff:
+s AtmoVent On OFF
+s AtmoMixer On OFF
+s CO2Injector On OFF
+j end
+
+allon:
+s AtmoVent On ON
+s AtmoMixer On ON
+s CO2Injector On ON
+j end
+
+end:
+yield
+j main

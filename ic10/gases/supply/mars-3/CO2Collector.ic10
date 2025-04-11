@@ -1,4 +1,7 @@
 alias AtmoVent d0
+alias Filtration d1
+alias Tank d2
+alias StatusLed d3
 
 define ON 1
 define OFF 0
@@ -7,17 +10,56 @@ define OUTWARD 0
 define INWARD 1
 
 define MAX_INPUT_PRESSURE 800
+define MIN_GAS_TEMP 275
+define TURN_ON_GAS_TEMP 288
+define MAX_GAS_PRESSURE 40000
+
+define GREEN 2
+define YELLOW 5
 
 s AtmoVent Mode INWARD
 s AtmoVent PressureInternal MAX_INPUT_PRESSURE
+s StatusLed On ON
 
 main:
+alias currFilterOn r5
+l currFilterOn Filtration On
 
 s AtmoVent Mode INWARD
 s AtmoVent PressureInternal MAX_INPUT_PRESSURE
 s AtmoVent On ON
 
+alias tankPressure r0
+alias tankTemperature r1
+l tankPressure Tank Pressure
+l tankTemperature Tank Temperature
 
+alias isOverPressure r2
+alias isUnderTemperature r3
+sge isOverPressure tankPressure MAX_GAS_PRESSURE
+sle isUnderTemperature tankTemperature MIN_GAS_TEMP
+
+alias turnOff r4
+or turnOff isOverPressure isUnderTemperature
+s db Setting tankTemperature
+bgtz turnOff turnoff
+
+# Already on? Keep on
+bgtz currFilterOn turnon
+
+# Turn back on?
+bge tankTemperature TURN_ON_GAS_TEMP turnon
+j end
+
+turnon:
+s StatusLed Color GREEN
+s Filtration On ON
+j end
+
+turnoff:
+s StatusLed Color YELLOW
+s Filtration On OFF
+j end
 
 end:
 yield
