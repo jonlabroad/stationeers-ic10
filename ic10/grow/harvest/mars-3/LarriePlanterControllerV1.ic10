@@ -1,0 +1,122 @@
+alias Larre d0
+alias SeedChute d1
+alias LockMem d2
+
+define ENABLE 1
+define DISABLE 0
+define LARRE_IDLE 1
+define LARRE_MOVING 0
+define HydroHash HASH("StructureHydroponicsTrayData")
+define DEPOSIT_STATION 11
+define HOME_STATION 12
+define FIRST_STATION 2
+define LAST_STATION 10
+define STATION_INC 1
+define LARRE_HYDRO_SLOT 255
+define LOCK_ID 2
+# States
+define STATE_IDLE 0
+define SEARCH_START 1
+define SEARCH_MOVING 2
+define SEARCH_CHECK 3
+define STATE_HARVEST 4
+define STATE_MOVING_HOME 5
+define STATE_DEPOSIT 6
+alias currState r0
+move currState STATE_IDLE
+main:
+l r14 LockMem Setting
+beqz r14 unlocked
+beq r14 LOCK_ID unlocked
+j end
+unlocked:
+
+s db Setting currState
+alias larreIdle r2
+l larreIdle Larre Idle
+alias larreSetting r4
+l larreSetting Larre Setting
+alias currStation r3
+
+# Flush bin if necessary
+alias seedsPresent r7
+ls seedsPresent SeedChute 0 Occupied
+beqz seedsPresent notOccupied
+
+beq currState STATE_IDLE idleState
+beq currState SEARCH_START searchStart
+beq currState SEARCH_MOVING searchMoving
+beq currState SEARCH_CHECK searchCheck
+beq currState STATE_HARVEST harvest
+beq currState STATE_MOVING_HOME moveDeposit
+beq currState STATE_DEPOSIT deposit
+j end # Shouldn't get here
+
+idleState:
+move currStation HOME_STATION
+s Larre Setting currStation
+bne larreIdle LARRE_IDLE end # Skip the rest if busy
+alias seedStatus r1
+lbs seedStatus HydroHash 0 Seeding Maximum
+blez seedStatus end
+
+move currStation FIRST_STATION
+move currState SEARCH_START
+j end
+
+searchStart:
+s Larre Setting currStation
+move currState SEARCH_MOVING
+j end
+
+searchMoving:
+# Check if Larre has arrived
+bne larreIdle LARRE_IDLE end
+move currState SEARCH_CHECK
+j end
+
+searchCheck:
+ls seedStatus Larre LARRE_HYDRO_SLOT Seeding
+bgt seedStatus 0 searchCheckHarvest
+add currStation STATION_INC currStation
+s Larre Setting currStation
+move currState SEARCH_MOVING 
+j end
+searchCheckHarvest:
+move currState STATE_HARVEST
+j end
+
+harvest:
+alias occupied r5
+ls occupied Larre LARRE_HYDRO_SLOT Occupied
+bne larreIdle LARRE_IDLE end # Skip the rest if busy
+
+beqz occupied harvestDone
+s Larre Activate ENABLE
+sleep 1
+j end
+harvestDone:
+move currState STATE_MOVING_HOME
+j end
+
+moveDeposit:
+s Larre Setting DEPOSIT_STATION
+yield
+bne larreIdle LARRE_IDLE end
+move currState STATE_DEPOSIT
+j end
+
+deposit:
+bne larreIdle LARRE_IDLE end
+alias clawOccupied r6
+ls clawOccupied Larre 0 Occupied
+beqz clawOccupied depositDone
+s Larre Activate ENABLE
+j end
+depositDone:
+move currState STATE_IDLE
+j end
+
+end:
+yield
+j main

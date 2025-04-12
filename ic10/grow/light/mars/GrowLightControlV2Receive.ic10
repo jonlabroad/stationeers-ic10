@@ -1,4 +1,4 @@
-alias DaylightSensor d0
+alias DaylightSensorReciever d0
 
 define ENABLE 1
 define DISABLE 0
@@ -6,12 +6,12 @@ define DISABLE 0
 define TRUE 1
 define FALSE 0
 
-define MIN_SHUTOFF 100
+define MIN_SHUTOFF 140
 
 main:
 
 alias vertical r0
-l vertical DaylightSensor Vertical
+l vertical DaylightSensorReciever Setting
 s db Setting vertical
 bgt vertical MIN_SHUTOFF shutoff
 
