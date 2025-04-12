@@ -1,5 +1,6 @@
 alias Larre d0
-alias DepositChute d1
+alias SeedChute d1
+alias LockMem d2
 
 define ENABLE 1
 define DISABLE 0
@@ -8,10 +9,11 @@ define LARRE_MOVING 0
 define HydroHash HASH("StructureHydroponicsTrayData")
 define DEPOSIT_STATION 11
 define HOME_STATION 12
-define FIRST_STATION 10
-define LAST_STATION 2
-define STATION_INC -1
+define FIRST_STATION 2
+define LAST_STATION 10
+define STATION_INC 1
 define LARRE_HYDRO_SLOT 255
+define LOCK_ID 2
 # States
 define STATE_IDLE 0
 define SEARCH_START 1
@@ -23,6 +25,12 @@ define STATE_DEPOSIT 6
 alias currState r0
 move currState STATE_IDLE
 main:
+l r14 LockMem Setting
+beqz r14 unlocked
+beq r14 LOCK_ID unlocked
+j end
+unlocked:
+
 s db Setting currState
 alias larreIdle r2
 l larreIdle Larre Idle
@@ -31,14 +39,9 @@ l larreSetting Larre Setting
 alias currStation r3
 
 # Flush bin if necessary
-alias binOccupied r7
-ls binOccupied DepositChute 0 Occupied
-beqz binOccupied notOccupied
-s DepositChute Open DISABLE
-j continue
-notOccupied:
-s DepositChute Open ENABLE
-continue:
+alias seedsPresent r7
+ls seedsPresent SeedChute 0 Occupied
+beqz seedsPresent notOccupied
 
 beq currState STATE_IDLE idleState
 beq currState SEARCH_START searchStart
