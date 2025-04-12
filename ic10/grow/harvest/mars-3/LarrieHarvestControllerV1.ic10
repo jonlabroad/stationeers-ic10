@@ -60,11 +60,15 @@ s Larre Setting currStation
 bne larreIdle LARRE_IDLE end # Skip the rest if busy
 alias seedStatus r1
 lbs seedStatus HydroHash 0 Seeding Maximum
-blez seedStatus end
+blez seedStatus nothingToDo
 
+s LockMem Setting LOCK_ID
 move currStation FIRST_STATION
 s Larre Setting currStation
 move currState SEARCH_MOVING
+j end
+nothingToDo:
+s LockMem Setting 0
 j end
 
 searchMoving:

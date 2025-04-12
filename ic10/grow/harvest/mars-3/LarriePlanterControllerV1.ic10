@@ -5,10 +5,10 @@ alias LockMem d2
 define ENABLE 1
 define DISABLE 0
 define LARRE_IDLE 1
-define LARRE_MOVING 0
 define HydroHash HASH("StructureHydroponicsTrayData")
+define SEED_STATION 1
 define DEPOSIT_STATION 11
-define HOME_STATION 12
+define HOME_STATION 0
 define FIRST_STATION 2
 define LAST_STATION 10
 define STATION_INC 1
@@ -16,11 +16,9 @@ define LARRE_HYDRO_SLOT 255
 define LOCK_ID 2
 # States
 define STATE_IDLE 0
-define SEARCH_START 1
-define SEARCH_MOVING 2
+define SEED_FETCH 1
 define SEARCH_CHECK 3
-define STATE_HARVEST 4
-define STATE_MOVING_HOME 5
+define STATE_PLANT 4
 define STATE_DEPOSIT 6
 alias currState r0
 move currState STATE_IDLE
@@ -37,82 +35,60 @@ l larreIdle Larre Idle
 alias larreSetting r4
 l larreSetting Larre Setting
 alias currStation r3
-
-# Flush bin if necessary
-alias seedsPresent r7
-ls seedsPresent SeedChute 0 Occupied
-beqz seedsPresent notOccupied
-
+alias lockAcquired r13
 beq currState STATE_IDLE idleState
-beq currState SEARCH_START searchStart
-beq currState SEARCH_MOVING searchMoving
+beq currState SEED_FETCH seedFetch
 beq currState SEARCH_CHECK searchCheck
-beq currState STATE_HARVEST harvest
-beq currState STATE_MOVING_HOME moveDeposit
+beq currState STATE_PLANT plant
 beq currState STATE_DEPOSIT deposit
 j end # Shouldn't get here
 
 idleState:
+alias occupiedStatus r1
+lbs occupiedStatus HydroHash 0 Occupied Minimum
+bgtz occupiedStatus nothingToDo
+jal tryGetLock
+beqz lockAcquired end # Check if We got the lock
+move currState SEED_FETCH
+j end
+nothingToDo:
 move currStation HOME_STATION
 s Larre Setting currStation
-bne larreIdle LARRE_IDLE end # Skip the rest if busy
-alias seedStatus r1
-lbs seedStatus HydroHash 0 Seeding Maximum
-blez seedStatus end
+jal waitUntilIdle
+s LockMem Setting 0
+j end
 
+seedFetch:
+s Larre Setting SEED_STATION
+jal waitUntilIdle
+s Larre Activate ENABLE
+jal waitUntilIdle
 move currStation FIRST_STATION
-move currState SEARCH_START
-j end
-
-searchStart:
-s Larre Setting currStation
-move currState SEARCH_MOVING
-j end
-
-searchMoving:
-# Check if Larre has arrived
-bne larreIdle LARRE_IDLE end
 move currState SEARCH_CHECK
 j end
 
+# Note: Currently assumes that something WILL be planted (unoccupied hydro exists)
 searchCheck:
-ls seedStatus Larre LARRE_HYDRO_SLOT Seeding
-bgt seedStatus 0 searchCheckHarvest
-add currStation STATION_INC currStation
-s Larre Setting currStation
-move currState SEARCH_MOVING 
-j end
-searchCheckHarvest:
-move currState STATE_HARVEST
-j end
-
-harvest:
-alias occupied r5
-ls occupied Larre LARRE_HYDRO_SLOT Occupied
-bne larreIdle LARRE_IDLE end # Skip the rest if busy
-
-beqz occupied harvestDone
+s Larre Setting currStation # Move to station
+jal waitUntilIdle
+ls occupiedStatus Larre LARRE_HYDRO_SLOT Occupied # Check for occupied
+beqz occupiedStatus plant # plant?
+add currStation STATION_INC currStation # NO, get next station
+j searchCheck # move on to next station
+plant:
 s Larre Activate ENABLE
-sleep 1
-j end
-harvestDone:
-move currState STATE_MOVING_HOME
-j end
-
-moveDeposit:
-s Larre Setting DEPOSIT_STATION
-yield
-bne larreIdle LARRE_IDLE end
+jal waitUntilIdle
 move currState STATE_DEPOSIT
 j end
 
 deposit:
-bne larreIdle LARRE_IDLE end
+s Larre Setting DEPOSIT_STATION
+jal waitUntilIdle
 alias clawOccupied r6
 ls clawOccupied Larre 0 Occupied
 beqz clawOccupied depositDone
 s Larre Activate ENABLE
-j end
+jal waitUntilIdle
 depositDone:
 move currState STATE_IDLE
 j end
@@ -120,3 +96,21 @@ j end
 end:
 yield
 j main
+
+waitUntilIdle:
+yield
+l larreIdle Larre Idle
+beq larreIdle LARRE_IDLE ra
+j waitUntilIdle
+
+tryGetLock:
+l r14 LockMem Setting
+beqz r14 isUnlocked # Check if lock not 0
+beq r14 LOCK_ID alreadyHaveLock
+move lockAcquired 0 # Else, no lock acquired
+j ra
+isUnlocked:
+s LockMem Setting LOCK_ID
+alreadyHaveLock:
+move lockAcquired 1
+j ra
