@@ -6,11 +6,11 @@ define ENABLE 1
 define DISABLE 0
 define LARRE_IDLE 1
 define HydroHash HASH("StructureHydroponicsTrayData")
-define SEED_STATION 1
-define DEPOSIT_STATION 11
+define SEED_STATION 2
+define DEPOSIT_STATION 1
 define HOME_STATION 0
-define FIRST_STATION 2
-define LAST_STATION 10
+define FIRST_STATION 3
+define LAST_STATION 12
 define STATION_INC 1
 define LARRE_HYDRO_SLOT 255
 define LOCK_ID 2

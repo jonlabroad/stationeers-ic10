@@ -1,0 +1,19 @@
+alias Chute d0
+
+define ENABLE 1
+define DISABLE 0
+
+main:
+
+# Flush bin if necessary
+alias binOccupied r0
+ls binOccupied Chute 0 Occupied
+beqz binOccupied notOccupied
+s Chute Open DISABLE
+j end
+notOccupied:
+s Chute Open ENABLE
+
+end:
+yield
+j main

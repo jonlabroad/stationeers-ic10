@@ -1,0 +1,41 @@
+alias AutoLathe d0
+alias PipeBender d1
+alias EPrinter d2
+alias Tool d3
+
+define NUM_MANUS 4
+
+main:
+alias currDevice r0
+move currDevice 0
+checkLoop:
+alias activated r1
+l activated dr0 Activate
+beqz activated next
+
+# device is currently active
+j handleActiveDevice
+
+next:
+add currDevice currDevice 1
+blt currDevice NUM_MANUS checkLoop
+j end
+
+handleActiveDevice:
+s dr0 ClearMemory 1
+handleActiveDeviceLoop:
+l r2 dr0 ExportCount
+bge r2 50 turnOff
+s db Setting r2
+l r3 dr0 Activate
+beqz r3 end
+yield
+j handleActiveDeviceLoop
+
+turnOff:
+s dr0 Activate 0
+j end
+
+end:
+yield
+j main
