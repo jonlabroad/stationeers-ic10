@@ -1,6 +1,5 @@
 alias Larre d0
-alias SeedChute d1
-alias LockMem d2
+alias LockMem d1
 
 define ENABLE 1
 define DISABLE 0

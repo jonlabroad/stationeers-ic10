@@ -6,7 +6,7 @@ define DISABLE 0
 define TRUE 1
 define FALSE 0
 
-define MIN_SHUTOFF 110
+define MIN_SHUTOFF 90
 
 main:
 
