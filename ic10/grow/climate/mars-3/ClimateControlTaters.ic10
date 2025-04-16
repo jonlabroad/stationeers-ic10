@@ -9,7 +9,7 @@ define OFF 0
 define MAX_ATMO_PRESSURE 95
 define DESIRED_PRESSURE 80
 define MIN_ATMO_PRESSURE 65
-#define MIN_CO2_MOLES 50
+define MIN_CO2_RATIO 0.25
 
 s CO2Injector Setting 1
 
@@ -20,6 +20,12 @@ l currVentOn AtmoVent On
 alias atmoPressure r0
 l atmoPressure AtmoSensor Pressure
 s db Setting atmoPressure
+
+alias co2Ratio r5
+l co2Ratio AtmoSensor RatioCarbonDioxide
+slt r10 co2Ratio MIN_CO2_RATIO
+s CO2Injector On r10
+s AtmoVent On r10
 
 # Shut down everything if over desired pressure
 bge atmoPressure DESIRED_PRESSURE alloff
@@ -32,13 +38,11 @@ j end
 alloff:
 s AtmoVent On OFF
 s AtmoMixer On OFF
-s CO2Injector On OFF
 j end
 
 allon:
 s AtmoVent On ON
 s AtmoMixer On ON
-s CO2Injector On ON
 j end
 
 end:

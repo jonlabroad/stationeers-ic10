@@ -12,6 +12,7 @@ define INWARD 1
 define MAX_INPUT_PRESSURE 800
 define MIN_GAS_TEMP 275
 define TURN_ON_GAS_TEMP 288
+define TURN_ON_GAS_PRESSURE 35000
 define MAX_GAS_PRESSURE 40000
 
 define GREEN 2
@@ -48,7 +49,10 @@ bgtz turnOff turnoff
 bgtz currFilterOn turnon
 
 # Turn back on?
-bge tankTemperature TURN_ON_GAS_TEMP turnon
+slt r11 tankPressure TURN_ON_GAS_PRESSURE
+sge r12 tankTemperature TURN_ON_GAS_TEMP
+and r13 r11 r12
+bgtz r13 turnon
 j end
 
 turnon:

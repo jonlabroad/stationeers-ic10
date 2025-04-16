@@ -1,6 +1,7 @@
 alias AtmoVent d0
 alias TankAnalyzer d1
 alias AtmoAnalyzer d2
+alias ManualFlushButton d3
 
 define ON 1
 define OFF 0
@@ -8,7 +9,7 @@ define INWARD 1
 define OUTWARD 0
 
 define MAX_TANK_PRESSURE 1500
-define CYCLE_ATMO_TEMP 228
+define CYCLE_ATMO_TEMP 238
 define CYCLE_TANK_TEMP 253
 
 define STATE_IDLE 0
@@ -22,10 +23,12 @@ main:
 alias atmoTemp r0
 alias tankPressure r1
 alias tankTemp r2
+alias manualButtonActivate r3
 
 l atmoTemp AtmoAnalyzer Temperature
 l tankPressure TankAnalyzer Pressure
 l tankTemp TankAnalyzer Temperature
+l manualButtonActivate ManualFlushButton Activate
 
 s db Setting currState
 
@@ -35,11 +38,15 @@ beq currState STATE_FILLING stateFilling
 j end
 
 stateIdle:
+beqz manualButtonActivate overrideOff
+move currState STATE_EMPTYING
+j end
+overrideOff:
 s AtmoVent On OFF
 # Cycle if tank temp is high and it is cold outside
 sgt r10 tankTemp CYCLE_TANK_TEMP
 slt r11 atmoTemp CYCLE_ATMO_TEMP
-and r10 r11 r12
+and r12 r10 r11
 beqz r12 end
 move currState STATE_EMPTYING
 j end
@@ -54,7 +61,7 @@ j end
 stateEmptying:
 s AtmoVent On ON
 s AtmoVent Mode OUTWARD
-bgt tankPressure 1 end
+bgt tankPressure 100 end
 move currState STATE_FILLING
 j end
 
