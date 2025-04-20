@@ -1,5 +1,4 @@
 alias AtmoSensor d0
-alias AtmoVent d1
 alias AtmoMixer d2 # Supplies base Nitrogen and Oxygen mix
 alias CO2Injector d3 # Injects CO2 into atmo mix
 
@@ -15,7 +14,6 @@ s CO2Injector Setting 1
 
 main:
 alias currVentOn r4
-l currVentOn AtmoVent On
 
 alias atmoPressure r0
 l atmoPressure AtmoSensor Pressure
@@ -25,7 +23,6 @@ alias co2Ratio r5
 l co2Ratio AtmoSensor RatioCarbonDioxide
 slt r10 co2Ratio MIN_CO2_RATIO
 s CO2Injector On r10
-s AtmoVent On r10
 
 # Shut down everything if over desired pressure
 bge atmoPressure DESIRED_PRESSURE alloff
@@ -36,12 +33,10 @@ ble atmoPressure MIN_ATMO_PRESSURE allon
 j end
 
 alloff:
-s AtmoVent On OFF
 s AtmoMixer On OFF
 j end
 
 allon:
-s AtmoVent On ON
 s AtmoMixer On ON
 j end
 

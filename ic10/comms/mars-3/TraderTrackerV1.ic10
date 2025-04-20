@@ -1,0 +1,96 @@
+alias EnableSwitch d0
+alias StatusLed d1
+alias Dish d2
+
+define DISABLE 0
+define ENABLE 1
+
+define Blue 0
+define Gray 1
+define Green 2
+define Orange 3
+define Red 4
+define Yellow 5
+define White 6
+define Black 7
+define Brown 8
+define Khaki 9
+define Pink 10
+define Purple 11
+
+define DISH_IDLE 1
+
+define STATE_IDLE 0
+define STATE_TRACKING_AZ 1
+
+s StatusLed On ENABLE
+
+alias currState r0
+move currState STATE_IDLE
+
+alias enableSwitch r1
+alias prevValue r2
+main:
+l enableSwitch EnableSwitch Open
+
+alias currAz r6
+l currAz Dish Horizontal
+sbn HASH("StructureConsoleLED5") HASH("Dish1Disp3") Setting currAz
+
+alias signalStrength r8
+l signalStrength Dish SignalStrength
+sbn HASH("StructureConsoleLED5") HASH("Dish1Disp1") Setting signalStrength
+
+#s db Setting currState
+beq currState STATE_IDLE stateIdle
+beq currState STATE_TRACKING_AZ stateAz
+j end
+
+stateIdle:
+s StatusLed Color Yellow
+beqz enableSwitch end
+move prevValue signalStrength
+move currState STATE_TRACKING_AZ
+j end
+
+stateAz:
+s StatusLed Color Blue
+
+alias currValue r3
+l currValue Dish SignalStrength
+
+alias diff r4
+sub diff currValue prevValue
+
+# Increment and wait
+add r7 currAz 10
+s Dish Horizontal r7
+s StatusLed Color Orange
+jal waitUntilDishIdle
+yield
+yield
+jal waitUntilSignalStrengthFound
+s StatusLed Color Blue
+move prevValue currValue
+
+j end
+
+waitUntilDishIdle:
+alias waitValue r5
+yield
+l waitValue Dish Idle
+bne waitValue DISH_IDLE waitUntilDishIdle
+j ra
+
+waitUntilSignalStrengthFound:
+alias waitValue r5
+yield
+l waitValue Dish SignalStrength
+s db Setting waitValue
+bltz waitValue waitUntilSignalStrengthFound 
+beq waitValue prevValue waitUntilSignalStrengthFound
+j ra
+
+end:
+yield
+j main
