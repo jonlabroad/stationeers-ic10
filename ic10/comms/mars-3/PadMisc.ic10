@@ -1,0 +1,21 @@
+define DISABLE 0
+define ENABLE 1
+
+main:
+jal setPadWarningLights
+
+end:
+yield
+j main
+
+setPadWarningLights:
+lb r14 HASH("Landingpad_DataConnectionPiece") Mode Maximum
+seq r13 r14 2
+seq r14 r14 3
+or r14 r13 r14
+bgtz r14 _setOn
+sbn HASH("StructureFlashingLight") HASH("Pad1 Warning Light") On DISABLE
+j ra
+_setOn:
+sbn HASH("StructureFlashingLight") HASH("Pad1 Warning Light") On ENABLE
+j ra
