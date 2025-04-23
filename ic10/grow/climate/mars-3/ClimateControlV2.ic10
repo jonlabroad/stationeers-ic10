@@ -1,0 +1,65 @@
+alias AtmoSensor d0
+alias AtmoPump d1
+alias CO2Injector d2
+alias AirFilter d3
+alias AirFilterBypass d4
+
+define ON 1
+define OFF 0
+
+define MAX_ATMO_PRESSURE 95
+define DESIRED_PRESSURE 80
+define MIN_ATMO_PRESSURE 65
+define MIN_CO2_RATIO 0.20
+define MIN_DESIRABLES_RATIO 0.9990
+
+s CO2Injector Setting 1
+s AirFilterBypass On OFF
+
+main:
+alias atmoPressure r0
+l atmoPressure AtmoSensor Pressure
+
+alias atmoRatioCO2 r1
+l atmoRatioCO2 AtmoSensor RatioCarbonDioxide
+
+alias atmoRatioNitrogen r2
+l atmoRatioNitrogen AtmoSensor RatioNitrogen
+
+alias desirablesRatio r3
+add desirablesRatio atmoRatioCO2 atmoRatioNitrogen
+
+alias atmoPumpOn r4
+l atmoPumpOn AtmoPump On
+
+jal controlAtmoPump
+jal controlCO2Supply
+#jal controlFilter
+
+end:
+yield
+j main
+
+controlAtmoPump:
+beq atmoPumpOn ON _pumpIsOn
+# Pump is OFF
+slt r14 atmoPressure MIN_ATMO_PRESSURE
+s AtmoPump On r14
+j ra
+_pumpIsOn:
+slt r14 atmoPressure DESIRED_PRESSURE
+s AtmoPump On r14
+j ra
+
+controlCO2Supply:
+slt r10 atmoRatioCO2 MIN_CO2_RATIO
+s CO2Injector On r10
+j ra
+
+controlFilter:
+# Only use filter if desireables are lower than threshold
+slt r14 desirablesRatio MIN_DESIRABLES_RATIO
+s AirFilter On r14
+nor r14 r14 r14
+s AirFilterBypass On r14
+j ra
