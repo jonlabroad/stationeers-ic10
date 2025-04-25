@@ -1,0 +1,117 @@
+alias Larre d0
+alias LockMem d1
+
+# Configuration
+define SEED_STATION 19
+define DEPOSIT_STATION 20
+define HOME_STATION 21
+define FIRST_STATION 18
+define LAST_STATION 0
+define STATION_INC -1
+
+define ENABLE 1
+define DISABLE 0
+define LARRE_IDLE 1
+define HydroHash HASH("StructureHydroponicsTrayData")
+define LARRE_HYDRO_SLOT 255
+define LOCK_ID 1
+# States
+define STATE_IDLE 0
+define SEARCH_CHECK 3
+define STATE_HARVEST 4
+define STATE_DEPOSIT 6
+alias currState r0
+alias lockAcquired r13
+move currState STATE_IDLE
+main:
+l r14 LockMem Setting
+beqz r14 unlocked
+beq r14 LOCK_ID unlocked
+j end
+unlocked:
+s db Setting currState
+alias larreIdle r2
+l larreIdle Larre Idle
+alias larreSetting r4
+l larreSetting Larre Setting
+alias currStation r3
+
+beq currState STATE_IDLE idleState
+beq currState SEARCH_CHECK searchCheck
+beq currState STATE_HARVEST harvest
+beq currState STATE_DEPOSIT deposit
+j end # Shouldn't get here
+
+idleState:
+alias seedStatus r1
+lbs seedStatus HydroHash 0 Seeding Maximum
+blez seedStatus nothingToDo
+jal tryGetLock
+move currStation FIRST_STATION
+move currState SEARCH_CHECK
+j end
+nothingToDo:
+move currStation HOME_STATION
+s Larre Setting currStation
+jal waitUntilIdle
+j end
+
+searchCheck:
+s Larre Setting currStation
+jal waitUntilIdle
+ls seedStatus Larre LARRE_HYDRO_SLOT Seeding
+bgt seedStatus 0 searchCheckHarvest
+add currStation STATION_INC currStation
+s Larre Setting currStation
+jal waitUntilIdle
+j end
+searchCheckHarvest:
+move currState STATE_HARVEST
+j end
+
+harvest:
+alias occupied r5
+s Larre Activate ENABLE
+jal waitUntilIdle
+ls occupied Larre LARRE_HYDRO_SLOT Occupied
+bnez occupied harvest
+harvestDone:
+move currState STATE_DEPOSIT
+j end
+
+deposit:
+s Larre Setting DEPOSIT_STATION
+jal waitUntilIdle
+alias clawOccupied r6
+ls clawOccupied Larre 0 Occupied
+beqz clawOccupied depositDone
+s Larre Activate ENABLE
+jal waitUntilIdle
+j deposit
+depositDone:
+move currState STATE_IDLE
+s Larre Setting HOME_STATION
+jal waitUntilIdle
+s LockMem Setting 0
+j end
+
+end:
+yield
+j main
+
+waitUntilIdle:
+yield
+l larreIdle Larre Idle
+beq larreIdle LARRE_IDLE ra
+j waitUntilIdle
+tryGetLock:
+l r14 LockMem Setting
+beqz r14 isUnlocked # Check if lock not 0
+beq r14 LOCK_ID alreadyHaveLock
+move lockAcquired 0 # Else, no lock acquired
+j ra
+isUnlocked:
+s LockMem Setting LOCK_ID
+alreadyHaveLock:
+move lockAcquired 1
+j ra

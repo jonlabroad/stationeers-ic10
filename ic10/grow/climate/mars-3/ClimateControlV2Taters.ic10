@@ -15,7 +15,6 @@ define MIN_DESIRABLES_RATIO 0.92
 define MAX_DESIRABLES_RATIO 0.97
 
 s CO2Injector Setting 1
-#s AirFilterBypass On OFF
 
 main:
 alias atmoPressure r0
