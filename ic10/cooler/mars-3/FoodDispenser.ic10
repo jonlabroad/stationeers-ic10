@@ -1,0 +1,33 @@
+alias Oven d0
+alias Bin d1
+alias Button d2
+
+define ON 1
+define OFF 0
+
+alias recipeHash r2
+move recipeHash HASH("buttonActivated")
+
+main:
+alias buttonActivated r0
+l buttonActivated Button Activate
+beqz buttonActivated end
+
+alias ovenOn r1
+l ovenOn Oven Activate
+bnez ovenOn end
+
+s Oven RecipeHash recipeHash
+s Oven ClearMemory 1
+s Oven Activate ON
+
+cookLoop:
+yield
+alias exportCount r3
+l exportCount Oven ExportCount
+bgtz exportCount end
+j cookLoop
+
+end:
+yield
+j main
