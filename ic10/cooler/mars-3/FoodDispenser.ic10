@@ -6,9 +6,11 @@ define ON 1
 define OFF 0
 
 alias recipeHash r2
-move recipeHash HASH("buttonActivated")
+move recipeHash HASH("itemBreadLoaf")
 
 main:
+s Oven Activate OFF
+
 alias buttonActivated r0
 l buttonActivated Button Activate
 beqz buttonActivated end
