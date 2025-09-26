@@ -10,11 +10,17 @@ define OFF 0
 define MAX_ATMO_PRESSURE 95
 define DESIRED_PRESSURE 80
 define MIN_ATMO_PRESSURE 65
-define MIN_CO2_RATIO 0.20
+define MIN_CO2_RATIO 0.10
 define MIN_DESIRABLES_RATIO 0.92
 define MAX_DESIRABLES_RATIO 0.97
+define WARNING_PRESSURE_THRESHOLD_START 60
+define WARNING_PRESSURE_THRESHOLD_END 65
+define ALARM_INTERVAL 10
 
 s CO2Injector Setting 1
+
+alias ticksSinceLastAlarm r12
+move ticksSinceLastAlarm 0
 
 main:
 alias atmoPressure r0
@@ -43,6 +49,9 @@ jal controlAtmoPump
 jal controlCO2Supply
 jal controlFilter
 jal setDisplays
+jal setAlarms
+
+add ticksSinceLastAlarm ticksSinceLastAlarm 1
 
 end:
 yield
@@ -86,4 +95,12 @@ j ra
 setDisplays:
 sbn HASH("StructureConsoleLED5") HASH("Pressure") Setting atmoPressure
 sbn HASH("StructureConsoleLED5") HASH("Ratio") Setting desirablesRatio
+j ra
+
+setAlarms:
+blt ticksSinceLastAlarm ALARM_INTERVAL ra
+sb HASH("StructureKlaxon") On OFF
+slt r14 atmoPressure WARNING_PRESSURE_THRESHOLD_START
+sb HASH("StructureKlaxon") On r14
+move ticksSinceLastAlarm 0
 j ra

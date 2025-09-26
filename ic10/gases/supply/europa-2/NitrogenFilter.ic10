@@ -1,0 +1,30 @@
+alias AirFilter d0
+
+define ON 1
+define OFF 0
+
+define TurnOnPressure 10
+define TurnOffPressure 0
+
+main:
+alias inputPressure r0
+l inputPressure AirFilter PressureInput
+
+alias isOn r1
+l isOn AirFilter On
+
+beqz isOn offCheck
+# It is ON
+bgt inputPressure TurnOffPressure end
+s AirFilter On OFF
+j end
+
+offCheck:
+# It is OFF
+blt inputPressure TurnOnPressure end
+s AirFilter On ON
+j end
+
+end:
+yield
+j main
