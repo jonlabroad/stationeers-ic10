@@ -1,0 +1,31 @@
+alias AutolatheSorter d0
+alias PipeSorter d1
+alias ElectronicsSorter d2
+alias ToolSorter d3
+
+define INGOT 19
+
+s AutolatheSorter Mode 1 # Any
+s PipeSorter Mode 1 # Any
+s ElectronicsSorter Mode 1 # Any
+#s ToolSorter Mode 1 # Any
+
+
+sll r0 INGOT 16
+sll r1 3 8 #3: NotEquals
+or r0 r0 r1
+or r0 r0 4 #SorterInstruction.FilterSlotTypeCompare
+alias instruction r15
+move instruction r0
+s db Setting instruction
+
+put AutolatheSorter 0 instruction
+put PipeSorter 0 instruction
+put ElectronicsSorter 0 instruction
+#put ToolSorter 0 instruction
+
+main:
+
+end:
+yield
+j main
