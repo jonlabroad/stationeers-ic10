@@ -1,0 +1,79 @@
+alias GasSensor d0
+alias SupplyAnalyzer d1
+alias SupplyPump d2
+alias StatusLed d3
+
+define ON 1
+define OFF 0
+
+define GREEN 2
+define ORANGE 3
+define RED 4
+define WHITE 6
+
+define CO2_TURNON 0.010
+define CO2_TURNOFF 0.025
+
+define MIN_ATMO_PRESSURE 60
+define MAX_ATMO_PRESSURE 120
+
+define MIN_SUPPLY_PRESSURE 1
+define LOW_SUPPLY_PRESSURE 50
+
+s SupplyAnalyzer On ON
+
+main:
+s StatusLed On ON
+alias pumpOn r4
+l pumpOn SupplyPump On
+
+pressureCheck:
+# In case of anomolous pressure, disable system
+alias currPressure r1
+l currPressure GasSensor Pressure
+blt currPressure MIN_ATMO_PRESSURE disable
+bgt currPressure MAX_ATMO_PRESSURE disable
+
+alias currSupplyPressure r2
+l currSupplyPressure SupplyAnalyzer Pressure
+
+alias ledColor r3
+move ledColor GREEN
+bgt currSupplyPressure LOW_SUPPLY_PRESSURE atmoCheck
+move ledColor ORANGE
+bgt currSupplyPressure MIN_SUPPLY_PRESSURE atmoCheck
+move ledColor RED
+
+atmoCheck:
+s db Setting currSupplyPressure
+s StatusLed Color ledColor
+
+blt currSupplyPressure MIN_SUPPLY_PRESSURE turnOff
+
+alias currCO2Ratio r0
+l currCO2Ratio GasSensor RatioCarbonDioxide
+
+bgtz pumpOn pumpIsOn
+
+# Pump is off
+bgt currCO2Ratio CO2_TURNON end
+s SupplyPump On ON
+j end
+
+pumpIsOn:
+blt currCO2Ratio CO2_TURNOFF end
+s SupplyPump On OFF
+j end
+
+turnOff:
+s SupplyPump On OFF
+j end
+
+disable:
+s SupplyPump On OFF
+s StatusLed On OFF
+j end
+
+end:
+yield
+j main

@@ -8,8 +8,7 @@ define INGOT 19
 s AutolatheSorter Mode 1 # Any
 s PipeSorter Mode 1 # Any
 s ElectronicsSorter Mode 1 # Any
-#s ToolSorter Mode 1 # Any
-
+s ToolSorter Mode 1 # Any
 
 sll r0 INGOT 16
 sll r1 3 8 #3: NotEquals
@@ -22,7 +21,7 @@ s db Setting instruction
 put AutolatheSorter 0 instruction
 put PipeSorter 0 instruction
 put ElectronicsSorter 0 instruction
-#put ToolSorter 0 instruction
+put ToolSorter 0 instruction
 
 main:
 
