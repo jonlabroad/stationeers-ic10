@@ -2,13 +2,23 @@ alias AutolatheSorter d0
 alias PipeSorter d1
 alias ElectronicsSorter d2
 alias ToolSorter d3
+alias RocketSorter d4
 
 define INGOT 19
+define ON 1
+define OFF 0
+
+s AutolatheSorter On ON
+s PipeSorter On ON
+s ElectronicsSorter On ON
+s ToolSorter On ON
+s RocketSorter On ON
 
 s AutolatheSorter Mode 1 # Any
 s PipeSorter Mode 1 # Any
 s ElectronicsSorter Mode 1 # Any
 s ToolSorter Mode 1 # Any
+s RocketSorter Mode 1 # Any
 
 sll r0 INGOT 16
 sll r1 3 8 #3: NotEquals
@@ -22,6 +32,7 @@ put AutolatheSorter 0 instruction
 put PipeSorter 0 instruction
 put ElectronicsSorter 0 instruction
 put ToolSorter 0 instruction
+put RocketSorter 0 instruction
 
 main:
 

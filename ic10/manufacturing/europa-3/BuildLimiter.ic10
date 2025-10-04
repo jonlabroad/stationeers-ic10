@@ -2,9 +2,13 @@ alias AutoLathe d0
 alias PipeBender d1
 alias EPrinter d2
 alias Tool d3
+alias Rocket d4
+alias LimitDial d5
 
-define NUM_MANUS 4
+define NUM_MANUS 5
 define ITEM_LIMIT 50
+
+alias buildLimit r8
 
 main:
 alias currDevice r0
@@ -25,8 +29,10 @@ j end
 handleActiveDevice:
 s dr0 ClearMemory 1
 handleActiveDeviceLoop:
+l buildLimit LimitDial Setting
 l r2 dr0 ExportCount
-bge r2 ITEM_LIMIT turnOff
+s db Setting r2
+bge r2 buildLimit turnOff
 s db Setting r2
 l r3 dr0 Activate
 beqz r3 end

@@ -1,0 +1,58 @@
+alias IndexSelectDial d0
+alias ActivateSwitch d1
+alias HashDisplay d2
+alias PurgeSorter d3
+alias ActiveLed d4
+
+define ON 1
+define OFF 0
+
+push HASH("ItemIronIngot")
+push HASH("ItemCopperIngot")
+push HASH("ItemGoldIngot")
+push HASH("ItemSilverIngot")
+push HASH("ItemNickelIngot")
+push HASH("ItemLeadIngot")
+push HASH("ItemSiliconIngot")
+push HASH("ItemConstantanIngot")
+push HASH("ItemElectrumIngot")
+push HASH("ItemInvarIngot")
+push HASH("ItemSolderIngot")
+push HASH("ItemSteelIngot")
+push HASH("ItemAstroloyIngot")
+push HASH("ItemHastelloyIngot")
+push HASH("ItemInconelIngot")
+push HASH("ItemStelliteIngot")
+push HASH("ItemWaspaloyIngot")
+
+s ActivateSwitch On OFF
+s PurgeSorter On ON
+
+main:
+alias selectedHashIndex r0
+l selectedHashIndex IndexSelectDial Setting
+
+alias selectedHash r1
+get selectedHash db selectedHashIndex
+s db Setting selectedHash
+
+alias switchOn r2
+l switchOn ActivateSwitch On
+s ActiveLed On switchOn
+beqz switchOn clearSorter
+
+# Switch is activated
+alias instruction r6
+sll instruction selectedHash 8
+or instruction instruction 1 #SorterInstruction.FilterPrefabHashEquals
+s PurgeSorter Mode 1 # Any
+put PurgeSorter 0 instruction
+j end
+
+clearSorter:
+clr PurgeSorter
+j end
+
+end:
+yield
+j main
