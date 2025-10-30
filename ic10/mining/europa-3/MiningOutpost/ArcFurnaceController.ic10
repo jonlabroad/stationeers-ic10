@@ -1,0 +1,26 @@
+alias ArcFurnace d0
+
+define ON 1
+define OFF 0
+
+s ArcFurnace On ON
+
+main:
+alias furnaceRunning r0
+l furnaceRunning ArcFurnace Activate
+
+alias occupied r1
+ls occupied ArcFurnace 0 Occupied
+s db Setting occupied
+
+# Already running? Do nothing
+bnez furnaceRunning end
+
+# Check for sm'ore
+blez occupied end
+
+s ArcFurnace Activate ON
+
+end:
+yield
+j main

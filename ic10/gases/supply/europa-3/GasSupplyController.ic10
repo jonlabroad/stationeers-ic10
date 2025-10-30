@@ -1,0 +1,55 @@
+alias PressurizerPump d0
+alias BackPressureRegulator d1
+alias SupplyAnalyzer d2
+
+define ON 1
+define OFF 0
+
+define RIGHT 0
+define LEFT 1
+
+define SUPPLY_PRESSURE_HIGH 10000
+define SUPPLY_PRESSURE_LOW 5000
+define BACKPRESSURE_THRESHOLD 12000
+
+s PressurizerPump On OFF
+s PressurizerPump Mode RIGHT
+s PressurizerPump Setting 50
+
+s BackPressureRegulator On ON
+s BackPressureRegulator Setting BACKPRESSURE_THRESHOLD
+
+main:
+alias supplyPressure r0
+l supplyPressure SupplyAnalyzer Pressure
+
+alias pumpOn r1
+l pumpOn PressurizerPump On
+
+# Always shut off if pressure is high
+bge supplyPressure SUPPLY_PRESSURE_HIGH shutoff
+
+beq pumpOn ON pumpIsOn
+
+# Pump if currently off
+pumpIsOff:
+# Turn on if pressure is low
+blt supplyPressure SUPPLY_PRESSURE_LOW turnon
+j end
+
+pumpIsOn:
+# Turn off if pressure is at threshold
+bgt supplyPressure SUPPLY_PRESSURE_HIGH shutoff
+j end
+
+turnon:
+s PressurizerPump On ON
+j end
+
+shutoff:
+s PressurizerPump On OFF
+j end
+
+end:
+yield
+j main

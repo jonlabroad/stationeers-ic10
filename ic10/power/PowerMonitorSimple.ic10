@@ -1,0 +1,51 @@
+alias InputAnalyzer d0
+alias OutputAnalyzer d1
+alias NetDisplay d2
+alias MovingAverageMemory d3
+alias MovingAverageConsole d4
+
+define ON 1
+define OFF 0
+
+define GREEN 2
+define RED 4
+
+s NetDisplay On ON
+s NetDisplay Mode 2
+
+alias movingAverage r3
+alias numSamples r4
+define MOVING_AVERAGE_LENGTH_MINUS_ONE 499
+define MOVING_AVERAGE_LENGTH 500
+move numSamples 0
+move movingAverage 0
+
+main:
+l r0 InputAnalyzer PowerActual
+l r1 OutputAnalyzer PowerActual
+
+sub r2 r0 r1
+
+min r6 numSamples MOVING_AVERAGE_LENGTH_MINUS_ONE
+mul r5 movingAverage r6
+add numSamples 1 numSamples
+min numSamples MOVING_AVERAGE_LENGTH numSamples
+add r5 r2 r5
+div movingAverage r5 numSamples
+s MovingAverageMemory Setting movingAverage
+s MovingAverageConsole Setting movingAverage
+s db Setting numSamples
+
+bgez r2 green
+s NetDisplay Color RED
+j display
+green:
+s NetDisplay Color GREEN
+
+display:
+abs r2 r2
+s NetDisplay Setting r2
+
+end:
+yield
+j main

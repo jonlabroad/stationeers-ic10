@@ -1,0 +1,99 @@
+alias ArcFurnace d0
+alias Centrifruge d1
+alias Transmitter d2
+alias Silo d3
+alias Battery d4
+
+define ON 1
+define OFF 0
+
+define MAX_REAGENTS 200
+define TRANSMIT_CLOCK_INTERVAL 5
+define MIN_TRANSMIT_CODE -3
+define CODE_SILO_INVENTORY -1
+define CODE_PROCESSING_QUANTITY -2
+define CODE_BATTERY_LEVEL -3
+
+s ArcFurnace On ON
+s Centrifruge On ON
+s Transmitter On ON
+
+alias transmitCode r7
+move transmitCode -1
+alias transmitClock r8
+move transmitClock 0
+alias transmitType r9
+move transmitType 0
+
+main:
+alias furnaceRunning r0
+l furnaceRunning ArcFurnace Activate
+
+alias occupied r1
+ls occupied ArcFurnace 0 Occupied
+
+alias batteryLevel r10
+l batteryLevel Battery Mode
+
+# Already running? Do nothing
+bnez furnaceRunning centrifugeControl
+
+# Check for sm'ore
+blez occupied centrifugeControl
+
+s ArcFurnace Activate ON
+
+centrifugeControl:
+alias centrifugeOpen r5
+l centrifugeOpen Centrifruge Open
+
+alias numReagents r6
+l numReagents Centrifruge Reagents
+s db Setting numReagents
+
+bgtz centrifugeOpen stateCentrifugeOpen
+
+stateCentrifugeClosed:
+blt numReagents MAX_REAGENTS dataTransmission
+s Centrifruge Open ON
+j dataTransmission
+
+stateCentrifugeOpen:
+bgtz numReagents dataTransmission
+s Centrifruge Open OFF
+j dataTransmission
+
+dataTransmission:
+bnez transmitClock end
+# Time to send something different
+beq transmitType 0 sendCode
+sendValue:
+beq transmitCode -1 sendSiloInventory
+beq transmitCode -2 sendProcessingQuantity
+beq transmitCode -3 sendBatteryLevel
+sendSiloInventory:
+l r14 Silo Quantity
+s Transmitter Setting r14
+j end
+sendProcessingQuantity:
+s Transmitter Setting numReagents
+j end
+sendBatteryLevel:
+s Transmitter Setting batteryLevel
+j end
+
+sendCode:
+sub transmitCode transmitCode 1
+bge transmitCode MIN_TRANSMIT_CODE sendCodeTransmit
+move transmitCode -1
+sendCodeTransmit:
+s Transmitter Setting transmitCode
+j end
+
+end:
+add transmitClock 1 transmitClock
+mod transmitClock transmitClock TRANSMIT_CLOCK_INTERVAL
+seqz r15 transmitClock
+xor transmitType transmitType r15
+yield
+j main

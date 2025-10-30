@@ -1,0 +1,44 @@
+define MAX_FUEL_PRESSURE 30000
+
+define ON 1
+define OFF 0
+
+define RIGHT 0
+define LEFT 1
+
+alias temp r15
+alias temp2 r14
+
+main:
+jal setFuelPressure
+jal setBattery
+jal fuelPump
+
+setFuelPressure:
+lb temp HASH("StructureLargeRocketGasFuelTank") Pressure Maximum
+div temp temp MAX_FUEL_PRESSURE
+sbn HASH("ModularDeviceGauge2x2") HASH("Fuel Gauge") Setting temp
+j ra
+
+setBattery:
+lb temp HASH("StructureBatteryMedium") Charge Maximum
+lb temp2 HASH("StructureBatteryMedium") Maximum Maximum
+div temp temp temp2
+sbn HASH("ModularDeviceSliderDiode1") HASH("BatteryLevel") On ON
+sbn HASH("ModularDeviceSliderDiode2") HASH("BatteryLevel") On ON
+sbn HASH("ModularDeviceSliderDiode1") HASH("BatteryLevel") Setting temp
+sbn HASH("ModularDeviceSliderDiode2") HASH("BatteryLevel") Setting temp
+j ra
+
+fuelPump:
+lbn temp HASH("StructureTurboVolumePump") HASH("Fuel Pump") Mode Maximum
+s db Setting temp
+sbn HASH("ModularDeviceLightSmall") HASH("FuelDirectionDownDiode") On temp
+seqz temp temp
+sbn HASH("ModularDeviceLightSmall") HASH("FuelDirectionUpDiode") On temp
+j ra
+
+
+end:
+yield
+j main

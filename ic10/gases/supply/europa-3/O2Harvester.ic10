@@ -1,0 +1,86 @@
+alias InputPump d0
+alias HeatValve d1
+alias StagingAnalyzer d2
+alias Filter d3
+alias OutputAnalyzer d4
+
+define ON 1
+define OFF 0
+
+define RIGHT 0
+define LEFT 1
+
+define MAX_OUTPUT_PRESSURE 20000
+define MIN_STAGING_PRESSURE 20000
+define HEATER_OFF_TEMPERATURE 374
+define HEATER_ON_TEMPERATURE 325
+define FILTER_STOP_PRESSURE 1000
+define FILTER_STOP_TEMPERATURE 230
+
+s InputPump On OFF
+s InputPump Mode RIGHT
+s InputPump Setting 60
+s HeatValve On OFF
+s StagingAnalyzer On ON
+s Filter On OFF
+s OutputAnalyzer On ON
+
+main:
+alias outputPressure r0
+l outputPressure OutputAnalyzer Pressure
+
+alias stagingPressure r1
+alias stagingTemp r2
+l stagingPressure StagingAnalyzer Pressure
+l stagingTemp StagingAnalyzer Temperature
+
+bgt outputPressure MAX_OUTPUT_PRESSURE allOff
+
+# Turn staging pump on if pressure is low enough
+alias isPressureNotOk r3
+slt isPressureNotOk stagingPressure MIN_STAGING_PRESSURE
+s InputPump On isPressureNotOk
+
+# Turn on heater if temp is too low
+alias heaterIsOn r10
+l heaterIsOn HeatValve On
+alias isTempTooLow r4
+slt isTempTooLow stagingTemp HEATER_ON_TEMPERATURE
+beq heaterIsOn OFF heaterIsOff
+heaterIsOn:
+alias turnOff r11
+slt turnOff stagingTemp HEATER_OFF_TEMPERATURE
+s HeatValve On turnOff
+j end
+heaterIsOff:
+s HeatValve On isTempTooLow
+
+alias isFilterOn r5
+l isFilterOn Filter On
+beq isFilterOn ON filterIsOn
+
+# Filter is off
+alias turnOnFilter r6
+or turnOnFilter isPressureNotOk isTempTooLow
+seqz turnOnFilter turnOnFilter
+s Filter On turnOnFilter
+j end
+
+filterIsOn:
+slt r7 stagingPressure FILTER_STOP_PRESSURE
+slt r8 stagingTemp FILTER_STOP_TEMPERATURE
+or r9 r7 r8
+seqz r9 r9
+s Filter On r9
+j end
+
+allOff:
+s InputPump On OFF
+s HeatValve On OFF
+alias keepFilterOn r13
+slt keepFilterOn 0 stagingPressure
+s Filter On keepFilterOn
+
+end:
+yield
+j main

@@ -1,0 +1,83 @@
+alias DataReceiver d0
+alias IronCount d1
+alias CopperCount d2
+alias SiliconCount d3
+alias ProcessingCount d4
+alias BatteryLevel d5
+
+define ON 1
+define OFF 0
+
+define MAX_REAGENTS 200
+
+define CODE_SILO_INVENTORY -1
+define CODE_PROCESSING_QUANTITY -2
+define CODE_BATTERY_LEVEL -3
+
+define Blue 0
+define Green 2
+define Orange 3
+define Red 4
+define Yellow 5
+define White 6
+
+alias currDataCode r0
+move currDataCode 0
+
+alias temp r15
+
+main:
+alias lastData r1
+l lastData DataReceiver Setting
+s db Setting lastData
+
+# Is it a data code?
+bge lastData 0 handleData
+move currDataCode lastData
+j end
+
+handleData:
+beqz currDataCode end
+beq currDataCode CODE_SILO_INVENTORY setSiloInventory
+beq currDataCode CODE_PROCESSING_QUANTITY setProcessingQuantity
+beq currDataCode CODE_BATTERY_LEVEL setBatteryLevel
+j end
+setSiloInventory:
+mul temp lastData 25 # 0.5
+round temp temp
+s IronCount Setting temp
+mul temp lastData 16.666667 # 0.333
+round temp temp
+s CopperCount Setting temp
+mul temp lastData 8.35 # 0.167
+round temp temp
+s SiliconCount Setting temp
+j end
+setProcessingQuantity:
+div temp lastData 200
+s ProcessingCount Setting temp
+move r13 temp
+jal getColorR13R12
+s ProcessingCount Color r12
+j end
+setBatteryLevel:
+div temp lastData 6
+s BatteryLevel Setting temp
+move r13 temp
+jal getColorR13R12
+s BatteryLevel Color r12
+j end
+
+getColorR13R12:
+move r12 Red
+blt r13 0.25 ra
+move r12 Yellow
+blt r13 0.5 ra
+move r12 Green
+blt r13 0.9 ra
+move r12 Blue
+j ra 
+
+end:
+yield
+j main
