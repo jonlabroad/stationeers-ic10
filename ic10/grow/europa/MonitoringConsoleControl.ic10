@@ -1,0 +1,66 @@
+alias GasSensor d0
+alias WaterAnalyzer d1
+alias NitrogenVent d2
+
+define ENABLE 1
+define DISABLE 0
+
+define MAX_PRESSURE 100
+
+main:
+alias totalMoles r1
+alias co2Moles r9
+l totalMoles GasSensor TotalMoles
+alias otherMoles r8
+move otherMoles totalMoles
+
+alias o2Moles r10
+l r3 GasSensor RatioOxygen
+mul o2Moles totalMoles r3
+sub otherMoles otherMoles o2Moles
+
+alias nMoles r11
+l r4 GasSensor RatioNitrogen
+mul nMoles totalMoles r4
+sub otherMoles otherMoles nMoles
+
+l r2 GasSensor RatioCarbonDioxide
+mul co2Moles totalMoles r2 
+sub otherMoles otherMoles co2Moles
+
+alias pressure r12
+l pressure GasSensor Pressure
+div pressure pressure MAX_PRESSURE
+
+bgt otherMoles 0.001 displayUndesireables
+move otherMoles 0
+displayUndesireables:
+
+alias waterVolume r7
+l waterVolume WaterAnalyzer VolumeOfLiquid
+s db Setting waterVolume
+div waterVolume waterVolume 40
+
+sbn HASH("ModularDeviceLEDdisplay3") HASH("CO2 Level") Setting co2Moles
+sbn HASH("ModularDeviceLEDdisplay3") HASH("CO2 Level") Color 1
+
+sbn HASH("ModularDeviceLEDdisplay3") HASH("O Level") Setting o2Moles
+sbn HASH("ModularDeviceLEDdisplay3") HASH("O Level") Color 6
+
+sbn HASH("ModularDeviceLEDdisplay3") HASH("N Level") Setting nMoles
+#sbn HASH("ModularDeviceLEDdisplay3") HASH("Undesireables Level") Color 4
+
+sbn HASH("ModularDeviceLEDdisplay3") HASH("Undesireables Level") Setting otherMoles
+sbn HASH("ModularDeviceLEDdisplay3") HASH("Undesireables Level") Color 4
+
+sbn HASH("ModularDeviceGauge3x3") HASH("Pressure Gauge") Setting pressure
+sbn HASH("ModularDeviceGauge3x3") HASH("Pressure Gauge") Color 6
+
+sbn HASH("ModularDeviceGauge2x2") HASH("Water") Setting waterVolume
+sbn HASH("ModularDeviceGauge2x2") HASH("Water") Color 0
+
+lbn r5 HASH("ModularDeviceFlipSwitch") HASH("Nitrogen Switch") On Maximum
+s NitrogenVent On r5
+
+yield
+j main
