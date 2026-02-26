@@ -6,13 +6,24 @@ define OFF 0
 define RIGHT 0
 define LEFT 1
 
+define Blue 0
+define Green 2
+define Orange 3
+define Red 4
+define Yellow 5
+define White 6
+define Black 7
+
 alias temp r15
 alias temp2 r14
+alias temp3 r13
 
 main:
 jal setFuelPressure
 jal setBattery
 jal fuelPump
+jal umbilicals
+j end
 
 setFuelPressure:
 lb temp HASH("StructureLargeRocketGasFuelTank") Pressure Maximum
@@ -21,23 +32,69 @@ sbn HASH("ModularDeviceGauge2x2") HASH("Fuel Gauge") Setting temp
 j ra
 
 setBattery:
-lb temp HASH("StructureBatteryMedium") Charge Maximum
-lb temp2 HASH("StructureBatteryMedium") Maximum Maximum
+lb temp HASH("StructureBatteryMedium") Charge Average
+lb temp2 HASH("StructureBatteryMedium") Maximum Average
 div temp temp temp2
 sbn HASH("ModularDeviceSliderDiode1") HASH("BatteryLevel") On ON
 sbn HASH("ModularDeviceSliderDiode2") HASH("BatteryLevel") On ON
 sbn HASH("ModularDeviceSliderDiode1") HASH("BatteryLevel") Setting temp
 sbn HASH("ModularDeviceSliderDiode2") HASH("BatteryLevel") Setting temp
+move r13 temp
+move r12 Red
+blt r13 0.25 ra
+move r12 Yellow
+blt r13 0.5 ra
+move r12 Green
+blt r13 0.9 ra
+move r12 Blue
+sbn HASH("ModularDeviceSliderDiode1") HASH("BatteryLevel") Color r12
+sbn HASH("ModularDeviceSliderDiode2") HASH("BatteryLevel") Color r12
 j ra
 
 fuelPump:
 lbn temp HASH("StructureTurboVolumePump") HASH("Fuel Pump") Mode Maximum
-s db Setting temp
 sbn HASH("ModularDeviceLightSmall") HASH("FuelDirectionDownDiode") On temp
+sbn HASH("ModularDeviceLightSmall") HASH("FuelDirectionDownDiode") Color Green
+
 seqz temp temp
 sbn HASH("ModularDeviceLightSmall") HASH("FuelDirectionUpDiode") On temp
+sbn HASH("ModularDeviceLightSmall") HASH("FuelDirectionUpDiode") Color Orange
+
+# Direction switch
+lbn temp HASH("ModularDeviceFlipSwitch") HASH("Fuel Direction Switch") Setting Maximum
+sbn HASH("StructureTurboVolumePump") HASH("Fuel Pump") Mode temp
+
+# Activate switch
+lbn temp HASH("ModularDeviceFlipCoverSwitch") HASH("Fuel Pump Activate Switch") On Maximum
+sbn HASH("StructureTurboVolumePump") HASH("Fuel Pump") On temp
 j ra
 
+umbilicals:
+# Control
+lbn temp HASH("ModularDeviceFlipSwitch") HASH("Umbilical Switch") Setting Maximum
+s db Setting temp
+sb HASH("StructureGasUmbilicalMale") Open temp
+sb HASH("StructurePowerUmbilicalMale") Open temp
+sb HASH("StructureChuteUmbilicalMale") Open temp
+
+# Status
+lb temp HASH("StructureGasUmbilicalMale") Open Maximum
+snez temp temp
+lb temp2 HASH("StructurePowerUmbilicalMale") Open Maximum
+snez temp2 temp2
+lb temp3 HASH("StructureChuteUmbilicalMale") Open Maximum
+snez temp3 temp3
+or temp temp temp2
+or temp temp temp3
+sbn HASH("ModularDeviceLightSmall") HASH("Umbilical Light") On temp
+
+move r12 Orange
+bgtz temp endUmbilical
+move r12 Black
+endUmbilical:
+sbn HASH("ModularDeviceLightSmall") HASH("Umbilical Light") Color r12
+
+j ra
 
 end:
 yield

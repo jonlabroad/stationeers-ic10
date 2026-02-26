@@ -22,11 +22,12 @@ alias pressure r2
 l pressure GasAnalyzer Pressure
 
 beq currState STATE_IDLE idleState
+beq currState STATE_PURGING purgingState
 j end
 
 idleState:
 # Check for liquid
-bgtz liquidVolume turnOn
+#bgtz liquidVolume turnOn
 # Check if pressure too high
 bgt pressure PRESSURE_MAX turnOn
 j end
