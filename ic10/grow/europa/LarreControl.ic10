@@ -1,0 +1,120 @@
+alias Larre d0
+
+define ENABLE 1
+define DISABLE 0
+
+define HydroHash HASH("StructureHydroponicsTrayData")
+
+define SEEDING 1
+define LARRE_HYDRO_SLOT 255
+define HOME_STATION 15
+define GROW_STATION_0 14
+define GROW_STATION_N 2
+define DEPOSIT_STATION 1
+define SEED_STATION 0
+define FORWARD_INC -1
+define BACKWARD_INC 1
+
+define STATE_IDLE 0
+define STATE_HARVEST_SEARCH 1
+define STATE_HARVEST 2
+define STATE_DEPOSIT 3
+define STATE_HOME 4
+
+alias larreIdle r4
+
+s Larre On ENABLE
+
+main:
+
+stateIdle:
+s Larre Setting HOME_STATION
+jal waitUntilIdle
+
+# Do any stations need harvesting?
+alias anySeeding r2
+lbs anySeeding HASH("StructureHydroponicsTrayData") 0 Seeding Maximum
+bgtz anySeeding stateHarvestSearch
+
+# Do any stations need planting?
+alias anyEmpty r2
+lbs anyEmpty HASH("StructureHydroponicsTrayData") 0 Occupied Minimum
+beqz anyEmpty stateGetSeeds
+j end
+
+stateHarvestSearch:
+alias currHarvestStation r1
+s Larre Setting GROW_STATION_0
+move currHarvestStation GROW_STATION_0
+harvestSearchLoop:
+jal waitUntilIdle
+
+alias seedStatus r3
+ls seedStatus Larre LARRE_HYDRO_SLOT Seeding
+beq seedStatus SEEDING stateHarvest
+add currHarvestStation FORWARD_INC currHarvestStation
+s Larre Setting currHarvestStation
+j harvestSearchLoop
+
+stateHarvest:
+alias plantPresent r5
+ls plantPresent Larre LARRE_HYDRO_SLOT Occupied
+beqz plantPresent stateDeposit
+
+s Larre Activate ENABLE
+jal waitUntilIdle
+j stateHarvest
+
+stateGetSeeds:
+s Larre Setting SEED_STATION
+jal waitUntilIdle
+s Larre Activate ENABLE
+jal waitUntilIdle
+j statePlantSeeds
+
+statePlantSeeds:
+alias currPlantStation r6
+move currPlantStation GROW_STATION_N
+plantSearchLoop:
+s Larre Setting currPlantStation
+jal waitUntilIdle
+ls r11 Larre LARRE_HYDRO_SLOT Occupied
+beqz r11 plant
+add currPlantStation BACKWARD_INC currPlantStation
+j plantSearchLoop
+
+plant:
+s Larre Activate ENABLE
+jal waitUntilIdle
+j putSeedsBack
+
+putSeedsBack:
+j stateDeposit
+
+stateDeposit:
+s Larre Setting DEPOSIT_STATION
+jal waitUntilIdle
+depositAll:
+ls r13 Larre 0 Occupied
+ls r14 Larre 1 Occupied
+or r13 r13 r14
+beqz r13 doneDepositing
+s Larre Activate ENABLE
+jal waitUntilIdle
+sb HASH("StructureChuteBin") Open DISABLE
+j depositAll
+doneDepositing:
+j stateIdle
+j end
+
+end:
+s Larre Setting HOME_STATION
+
+yield
+j main
+
+waitUntilIdle:
+yield
+l larreIdle Larre Idle
+beq larreIdle ENABLE ra
+j waitUntilIdle

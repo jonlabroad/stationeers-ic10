@@ -1,0 +1,31 @@
+alias GasSensor d0
+alias CO2Analyzer d1
+alias CO2Vent d2
+
+define ENABLE 1
+define DISABLE 0
+
+define MAX_CO2_RATIO 0.50
+
+main:
+alias ratioCarbonDioxide r0
+l ratioCarbonDioxide GasSensor RatioCarbonDioxide
+
+alias supplyPressure r1
+l supplyPressure CO2Analyzer Pressure
+
+bge ratioCarbonDioxide MAX_CO2_RATIO turnOff
+ble supplyPressure 0.01 turnOff
+j turnOn
+
+turnOn:
+s CO2Vent On ENABLE
+j end
+
+turnOff:
+s CO2Vent On DISABLE
+j end
+
+end:
+yield
+j main
