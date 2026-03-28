@@ -1,0 +1,39 @@
+alias DaylightSensor d0
+
+define SOLAR_HASH HASH("StructureSolarPanel")
+define SOLAR_HEAVY_HASH HASH("StructureSolarPanelHeavy")
+
+alias vertical r0
+move vertical 120 # 90 absolute high, 180 absolute low
+
+alias horizontal r1
+move horizontal 270 # sunrise around 270, sunset around 0
+# daylight sensor
+# vertical: approx 60 to 90
+# horizontal: -160 to -60 (approx)
+
+# rough mappings:
+# horizontal: (270 panel, -160/200 sun) to (0/360 panel, -60/300 sun)
+# vertical: (90 panel, 60/90 sun) to (180 panel, 0/60 sun)
+
+main:
+    alias verticalReading r2
+    alias horizontalReading r3
+    l verticalReading DaylightSensor Vertical
+    l horizontalReading DaylightSensor Horizontal
+
+    alias panelHorizontal r4
+    add panelHorizontal horizontalReading 90
+
+    alias panelVertical r5
+    add panelVertical verticalReading 90
+    s db Setting panelVertical
+
+    sb SOLAR_HASH Horizontal panelHorizontal
+    sb SOLAR_HEAVY_HASH Horizontal panelHorizontal
+
+    sb SOLAR_HASH Vertical panelVertical
+    sb SOLAR_HEAVY_HASH Vertical panelVertical
+
+    yield
+j main

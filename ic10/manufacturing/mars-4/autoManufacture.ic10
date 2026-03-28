@@ -1,0 +1,38 @@
+
+define ON 1
+define OFF 0
+
+define STEEL_SHEET_STACK_SIZE 30
+define outputHash HASH("StructureChuteExportBin")
+
+alias outputOccupied r0
+
+sb HASH("StructureAutolathe") ClearMemory ON
+
+main:
+alias autolatheActive r1
+lb autolatheActive HASH("StructureAutolathe") Activate Maximum
+s db Setting 777
+bnez autolatheActive checkIfDone
+
+steelSheets:
+lbns outputOccupied outputHash HASH("outSteelSheets") 0 Occupied Maximum
+bnez outputOccupied done # this will go to the next product when they are impl
+
+# Create steel sheets
+s db Setting STEEL_SHEET_STACK_SIZE
+sb HASH("StructureAutolathe") RecipeHash HASH("ItemSteelSheets")
+sb HASH("StructureAutolathe") ClearMemory ON
+sb HASH("StructureAutolathe") Activate ON
+j done
+
+checkIfDone:
+alias exportCount r3
+lb exportCount HASH("StructureAutolathe") ExportCount Maximum 
+blt exportCount STEEL_SHEET_STACK_SIZE done
+sb HASH("StructureAutolathe") Activate OFF
+
+
+done:
+yield
+j main

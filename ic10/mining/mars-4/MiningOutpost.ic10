@@ -1,0 +1,77 @@
+alias DaylightSensor d0
+alias ArcFurnace d1
+alias Centrifruge d2
+
+define SOLAR_HASH HASH("StructureSolarPanel")
+define SOLAR_HEAVY_HASH HASH("StructureSolarPanelDualReinforced")
+
+define MAX_REAGENTS 200
+
+define ON 1
+define OFF 0
+
+alias vertical r0
+move vertical 120 # 90 absolute high, 180 absolute low
+
+alias horizontal r1
+move horizontal 270 # sunrise around 270, sunset around 0
+
+s ArcFurnace On ON
+s Centrifruge On ON
+
+main:
+    alias furnaceRunning r0
+    l furnaceRunning ArcFurnace Activate
+
+    alias occupied r1
+    ls occupied ArcFurnace 0 Occupied
+
+    # Already running? Do nothing
+    bnez furnaceRunning centrifugeControl
+
+    # Check for sm'ore
+    blez occupied centrifugeControl
+
+    s ArcFurnace Activate ON
+
+    centrifugeControl:
+    alias centrifugeOpen r5
+    l centrifugeOpen Centrifruge Open
+
+    alias numReagents r6
+    l numReagents Centrifruge Reagents
+    s db Setting numReagents
+
+    bgtz centrifugeOpen stateCentrifugeOpen
+
+    stateCentrifugeClosed:
+    blt numReagents MAX_REAGENTS panelControl
+    s Centrifruge Open ON
+    j panelControl
+
+    stateCentrifugeOpen:
+    bgtz numReagents panelControl
+    s Centrifruge Open OFF
+    j panelControl
+
+    panelControl:
+    alias verticalReading r2
+    alias horizontalReading r3
+    l verticalReading DaylightSensor Vertical
+    l horizontalReading DaylightSensor Horizontal
+
+    alias panelHorizontal r4
+    add panelHorizontal horizontalReading 90
+
+    alias panelVertical r5
+    add panelVertical verticalReading 90
+    s db Setting panelVertical
+
+    sb SOLAR_HASH Horizontal panelHorizontal
+    sb SOLAR_HEAVY_HASH Horizontal panelHorizontal
+
+    sb SOLAR_HASH Vertical panelVertical
+    sb SOLAR_HEAVY_HASH Vertical panelVertical
+
+    yield
+j main
