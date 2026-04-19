@@ -1,7 +1,7 @@
 alias DaylightSensor d0
 
 define SOLAR_HASH HASH("StructureSolarPanel")
-define SOLAR_HEAVY_HASH HASH("StructureSolarPanelHeavy")
+define SOLAR_HEAVY_HASH HASH("StructureSolarPanelReinforced")
 
 alias vertical r0
 move vertical 120 # 90 absolute high, 180 absolute low

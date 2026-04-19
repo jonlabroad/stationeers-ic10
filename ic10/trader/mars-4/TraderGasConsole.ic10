@@ -1,0 +1,125 @@
+alias StagingAnalyzer d0
+
+define PumpDirectionHash HASH("ModularDeviceFlipSwitch")
+define PumpOnHash HASH("ModularDeviceFlipCoverSwitch")
+define LabelHash HASH("ModularDeviceLabelDiode2")
+define OxygenNameHash HASH("Oxygen")
+define CO2NameHash HASH("CO2")
+define STATE_IDLE 0
+define STATE_OXYGEN 1
+define STATE_CO2 2
+define STATE_UNKNOWN 99
+define STAGING_UNKNOWN 0
+define STAGING_NONE 1
+define STAGING_OXYGEN 2
+define STAGING_CO2 3
+
+alias currState r0
+alias currNameHash r2
+alias currExpectedGas r8
+alias currStagingMix r1
+alias currPumpOn r4
+alias currPumpMode r5
+alias pumpOnControl r6
+alias pumpDirectionControl r7
+
+define NUM_HASHES 2
+clr db
+push HASH("Oxygen")
+push HASH("CO2")
+move currState STATE_IDLE
+move currStagingMix STAGING_UNKNOWN
+main:
+# Pad import/export
+lbn r14 HASH("ModularDeviceSwitch") HASH("Import") On Maximum
+sbn HASH("Landingpad_GasConnectorInwardPiece") HASH("Gas") On r14
+lbn r14 HASH("ModularDeviceSwitch") HASH("Export") On Maximum
+sbn HASH("Landingpad_GasConnectorOutwardPiece") HASH("Gas") On r14
+
+jal detectStagingMix
+s db Setting currState
+beq currState STATE_IDLE stateIdle
+beq currState STATE_OXYGEN stateOxygen
+beq currState STATE_CO2 stateCO2
+beq currState STATE_UNKNOWN stateUnknownMix
+j end
+
+stateIdle:
+move currState STATE_IDLE
+jal idleControlPumps
+jal detectStagingMix
+beq currStagingMix STAGING_UNKNOWN stateUnknownMix
+beq currStagingMix STAGING_OXYGEN stateOxygen
+beq currStagingMix STAGING_CO2 stateCO2
+sb LabelHash On 1
+j end
+
+stateOxygen:
+move currState STATE_OXYGEN
+move currNameHash OxygenNameHash
+move currExpectedGas STAGING_OXYGEN
+jal executeCurrentState
+bne currStagingMix currExpectedGas stateIdle
+j end
+
+stateCO2:
+move currState STATE_CO2
+move currNameHash CO2NameHash
+move currExpectedGas STAGING_CO2
+jal executeCurrentState
+bne currStagingMix currExpectedGas stateIdle
+j end
+
+stateUnknownMix:
+move currState STATE_UNKNOWN
+move currNameHash 0
+jal disableOtherGasControls
+j end
+
+end:
+yield
+j main
+
+idleControlPumps:
+move r14 0 # Disable other gas controls
+pumpLoop:
+bge r14 sp ra
+get r15 db r14
+lbn pumpOnControl PumpOnHash r15 On Maximum
+lbn pumpDirectionControl PumpDirectionHash r15 On Maximum
+sbn HASH("StructureTurboVolumePump") r15 On pumpOnControl
+sbn HASH("StructureTurboVolumePump") r15 Mode pumpDirectionControl
+sbn LabelHash r15 Mode pumpOnControl
+add r14 r14 1
+j pumpLoop
+
+executeCurrentState:
+lbn pumpOnControl PumpOnHash currNameHash On Maximum
+lbn pumpDirectionControl PumpDirectionHash currNameHash On Maximum
+sbn HASH("StructureTurboVolumePump") currNameHash On pumpOnControl
+sbn HASH("StructureTurboVolumePump") currNameHash Mode pumpDirectionControl
+sbn LabelHash currNameHash Mode pumpOnControl
+move r14 0 # Disable other gas controls
+disableLoop:
+bge r14 sp ra
+get r15 db r14
+beq currNameHash r15 skipDisable
+sbn LabelHash r15 On 0
+sbn HASH("StructureTurboVolumePump") r15 On 0
+skipDisable:
+add r14 r14 1
+j disableLoop
+
+detectStagingMix:
+move currStagingMix STAGING_NONE
+l r14 StagingAnalyzer TotalMoles
+ble r14 0.0001 ra
+# Has gas
+move currStagingMix STAGING_OXYGEN
+l r14 StagingAnalyzer RatioOxygen
+bge r14 1.0 ra
+move currStagingMix STAGING_CO2
+l r14 StagingAnalyzer RatioCarbonDioxide
+bge r14 1.0 ra
+move currStagingMix STAGING_UNKNOWN
+j ra

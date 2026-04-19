@@ -1,0 +1,46 @@
+alias CoolerPump d0
+alias CoolerAnalyzer d1
+
+define ON 1
+define OFF 0
+
+define RIGHT 0
+define LEFT 1
+
+define REVERSE_TEMP_K 373
+define REVERSE_MIN_PRESSURE 1000
+
+alias reversing r2
+move reversing OFF
+main:
+s CoolerAnalyzer On ON
+
+bgtz reversing waitUntilZero
+
+alias coolerPressure r0
+l coolerPressure CoolerAnalyzer Pressure
+beqz coolerPressure end
+
+alias coolerTemp r1
+l coolerTemp CoolerAnalyzer Temperature
+blt coolerPressure REVERSE_MIN_PRESSURE end
+blt coolerTemp REVERSE_TEMP_K startReverse
+j end
+
+startReverse:
+move reversing ON
+s CoolerPump Mode LEFT
+j end
+
+waitUntilZero:
+sleep 1
+l coolerPressure CoolerAnalyzer Pressure
+bgtz coolerPressure waitUntilZero
+move reversing OFF
+s CoolerPump Mode RIGHT
+s CoolerPump On OFF
+j end
+
+end:
+yield
+j main

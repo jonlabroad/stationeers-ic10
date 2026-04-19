@@ -3,7 +3,8 @@ alias ArcFurnace d1
 alias Centrifruge d2
 
 define SOLAR_HASH HASH("StructureSolarPanel")
-define SOLAR_HEAVY_HASH HASH("StructureSolarPanelDualReinforced")
+define SOLAR_HEAVY_HASH HASH("StructureSolarPanelReinforced")
+define SOLAR_HEAVY_DUAL_HASH HASH("StructureSolarPanelDualReinforced")
 
 define MAX_REAGENTS 200
 
@@ -69,9 +70,11 @@ main:
 
     sb SOLAR_HASH Horizontal panelHorizontal
     sb SOLAR_HEAVY_HASH Horizontal panelHorizontal
+    sb SOLAR_HEAVY_DUAL_HASH Horizontal panelHorizontal
 
     sb SOLAR_HASH Vertical panelVertical
     sb SOLAR_HEAVY_HASH Vertical panelVertical
+    sb SOLAR_HEAVY_DUAL_HASH Vertical panelVertical
 
     yield
 j main

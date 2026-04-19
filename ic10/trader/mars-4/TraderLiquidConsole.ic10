@@ -1,0 +1,117 @@
+alias StagingAnalyzer d0
+
+define PumpDirectionHash HASH("ModularDeviceFlipSwitch")
+define PumpOnHash HASH("ModularDeviceFlipCoverSwitch")
+define LabelHash HASH("ModularDeviceLabelDiode2")
+define H2ONameHash HASH("H2O")
+define STATE_IDLE 0
+define STATE_H2O 1
+define STATE_UNKNOWN 99
+define STAGING_UNKNOWN 0
+define STAGING_NONE 1
+define STAGING_H2O 2
+
+alias currState r0
+alias currNameHash r2
+alias currExpectedGas r8
+alias currStagingMix r1
+alias currPumpOn r4
+alias currPumpMode r5
+alias pumpOnControl r6
+alias pumpDirectionControl r7
+
+clr db
+push HASH("H2O")
+move currState STATE_IDLE
+move currStagingMix STAGING_UNKNOWN
+main:
+# Pad import/export
+lbn r14 HASH("ModularDeviceSwitch") HASH("LiquidImport") On Maximum
+sbn HASH("Landingpad_LiquidConnectorInwardPiece") HASH("Liquid") On r14
+lbn r14 HASH("ModularDeviceSwitch") HASH("LiquidExport") On Maximum
+sbn HASH("Landingpad_LiquidConnectorOutwardPiece") HASH("Liquid") On r14
+
+jal detectStagingMix
+beq currState STATE_IDLE stateIdle
+beq currState STATE_H2O stateH2O
+beq currState STATE_UNKNOWN stateUnknownMix
+j end
+
+stateIdle:
+move currState STATE_IDLE
+jal idleControlPumps
+jal detectStagingMix
+beq currStagingMix STAGING_UNKNOWN stateUnknownMix
+beq currStagingMix STAGING_H2O stateH2O
+sb LabelHash On 1
+j end
+
+stateH2O:
+move currState STATE_H2O
+move currNameHash H2ONameHash
+move currExpectedGas STAGING_H2O
+jal executeCurrentState
+bne currStagingMix currExpectedGas stateIdle
+j end
+
+stateCO2:
+move currState STATE_CO2
+move currNameHash CO2NameHash
+move currExpectedGas STAGING_CO2
+jal executeCurrentState
+bne currStagingMix currExpectedGas stateIdle
+j end
+
+stateUnknownMix:
+move currState STATE_UNKNOWN
+move currNameHash 0
+jal executeCurrentState
+j end
+
+end:
+yield
+j main
+
+idleControlPumps:
+move r14 0 # Disable other gas controls
+pumpLoop:
+bge r14 sp ra
+get r15 db r14
+lbn pumpOnControl PumpOnHash r15 On Maximum
+lbn pumpDirectionControl PumpDirectionHash r15 On Maximum
+sbn HASH("StructureLiquidTurboVolumePump") r15 On pumpOnControl
+sbn HASH("StructureLiquidTurboVolumePump") r15 Mode pumpDirectionControl
+sbn LabelHash r15 Mode pumpOnControl
+add r14 r14 1
+j pumpLoop
+
+executeCurrentState:
+lbn pumpOnControl PumpOnHash currNameHash On Maximum
+lbn pumpDirectionControl PumpDirectionHash currNameHash On Maximum
+sbn HASH("StructureLiquidTurboVolumePump") currNameHash On pumpOnControl
+sbn HASH("StructureLiquidTurboVolumePump") currNameHash Mode pumpDirectionControl
+sbn LabelHash currNameHash Mode pumpOnControl
+move r14 0 # Disable other gas controls
+disableLoop:
+bge r14 sp ra
+get r15 db r14
+beq currNameHash r15 skipDisable
+sbn LabelHash r15 On 0
+sbn HASH("StructureLiquidTurboVolumePump") r15 On 0
+skipDisable:
+add r14 r14 1
+j disableLoop
+
+detectStagingMix:
+move currStagingMix STAGING_NONE
+l r14 StagingAnalyzer TotalMoles
+ble r14 0.0001 ra
+# Has gas
+move currStagingMix STAGING_H2O
+l r14 StagingAnalyzer RatioWater
+l r13 StagingAnalyzer RatioSteam
+add r14 r14 r13
+s db Setting r14
+bge r14 0.99999 ra
+move currStagingMix STAGING_UNKNOWN
+j ra

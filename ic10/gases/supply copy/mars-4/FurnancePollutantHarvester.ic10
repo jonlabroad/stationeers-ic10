@@ -1,0 +1,90 @@
+# Stages:
+# 1. Furnace Out -> Exhaust Storage Tank
+# 2. Exhaust Storage Tank -> Pollutant Filter
+# 3. Pollutant Filter -> Pollutant Storage Tank (Hot)
+# 4. Pollutant Storage Tank (Hot) -> Pollutant Cooler Stage
+# 5. Pollutant Cooler Stage -> Pollutant Staging Tanks
+# 6. Pollutant Staging Tanks -> Pollutant Storage (Liquid)
+
+alias pollutantSourceAnalyzer d0
+alias pollutantCoolerAnalyzer d1
+alias pollutantStagingAnalyzer d2
+alias pollutantStorageAnalyzer d3
+alias coolerInputPump d4
+alias coolerOutputPump d5
+
+define ON 1
+define OFF 0
+
+define MIN_LIQUID_STORAGE_L 225
+define MAX_LIQUID_STORAGE_L 250
+
+define MIN_MOLES_SOURCE 100
+
+define TARGET_COOLER_TEMP 283
+define COOLER_FILL_TO_PRESSURE 3000
+
+define MIN_STAGING_PRESSURE 300
+define MAX_STAGING_PRESSURE 2000
+
+
+main:
+alias sourceMoles r0
+l sourceMoles pollutantSourceAnalyzer TotalMoles
+
+alias coolerPressure r1
+l coolerPressure pollutantCoolerAnalyzer Pressure
+
+alias coolerTemperature r4
+l coolerTemperature pollutantCoolerAnalyzer Temperature
+
+alias stagingPressure r2
+l stagingPressure pollutantStagingAnalyzer Pressure
+
+alias storageLiquidVolume r3
+l storageLiquidVolume pollutantStorageAnalyzer Volume
+
+alias coolerInputOn r5
+l coolerInputOn coolerInputPump On
+
+alias coolerOutputOn r6
+l coolerOutputOn coolerOutputPump On
+
+s db Setting coolerPressure
+
+# Do we need more final product?
+bgt MAX_LIQUID_STORAGE_L storageLiquidVolume end
+
+# Do we need to fill the cooler?
+blt sourceMoles MIN_MOLES_SOURCE noNeedToFillCooler # Don't fill if not enough in source
+bgt coolerPressure 1 noNeedToFillCooler
+bgtz coolerOutputOn noNeedToFillCooler # Output is still on
+fillCooler:
+s coolerInputPump On ON
+yield
+l coolerPressure pollutantCoolerAnalyzer Pressure
+s db Setting coolerPressure
+blt coolerPressure COOLER_FILL_TO_PRESSURE fillCooler
+s coolerInputPump On OFF
+
+noNeedToFillCooler:
+# Should we empty the cooler?
+l coolerTemperature pollutantCoolerAnalyzer Temperature
+l coolerPressure pollutantCoolerAnalyzer Pressure
+bgt coolerTemperature TARGET_COOLER_TEMP doneEmptyingCooler
+blt coolerPressure 1 doneEmptyingCooler
+emptyCooler:
+l stagingPressure pollutantStagingAnalyzer Pressure
+bgt stagingPressure MAX_STAGING_PRESSURE doneEmptyingCooler
+s coolerOutputPump On ON
+yield
+l coolerPressure pollutantCoolerAnalyzer Pressure
+bgt coolerPressure 1 emptyCooler
+
+
+doneEmptyingCooler:
+s coolerOutputPump On OFF
+
+end:
+yield
+j main

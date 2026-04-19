@@ -1,0 +1,38 @@
+alias Mixer d0
+alias GasAnalyzer d1
+
+define DISABLE 0
+define ENABLE 1
+define ON 1
+define OFF 0
+
+define MixRatio 66.67
+
+define MIN_PRESSURE 5000
+define MAX_PRESSURE 7000
+
+s Mixer Setting MixRatio
+main:
+s GasAnalyzer On ON
+
+alias mixerOn r0
+l mixerOn Mixer On
+
+alias gasPressure r1
+l gasPressure GasAnalyzer Pressure
+
+bgtz mixerOn mixerCurrentlyOn
+mixerCurrentlyOff:
+bgt gasPressure MIN_PRESSURE end
+s Mixer On ON
+j end
+
+mixerCurrentlyOn:
+blt gasPressure MAX_PRESSURE end
+s Mixer On OFF
+j end
+
+end:
+yield
+j main
+

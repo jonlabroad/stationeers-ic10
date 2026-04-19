@@ -1,0 +1,41 @@
+alias AnalyzerTank0 d0
+alias Pump0 d1
+alias AnalyzerPipeline0 d2
+
+define ON 1
+define OFF 0
+
+define PIPELINE_PRESSURE 5000
+define MIN_TANK_PRESSURE 100
+
+s AnalyzerPipeline0 On ON
+s AnalyzerTank0 On ON
+s Pump0 On OFF
+
+main:
+alias tankPressure r0
+alias pipelinePressure r1
+
+l pipelinePressure AnalyzerPipeline0 Pressure
+l tankPressure AnalyzerTank0 Pressure
+
+# Hit target pressure?
+bge pipelinePressure PIPELINE_PRESSURE turnoff
+
+# No source gas left?
+ble tankPressure MIN_TANK_PRESSURE turnoff
+
+# Otherwise turn on
+j turnon
+
+end:
+yield
+j main
+
+turnon:
+s Pump0 On ON
+j end
+
+turnoff:
+s Pump0 On OFF
+j end

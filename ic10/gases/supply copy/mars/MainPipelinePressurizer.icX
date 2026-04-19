@@ -1,0 +1,50 @@
+alias Pump0 d0
+alias BackpressureRegulator0 d1
+alias Analyzer0 d2
+alias Pump1 d3
+alias BackpressureRegulator1 d4
+alias Analyzer1 d5
+
+const ENABLE = 1
+const DISABLE = 0
+
+const TARGET_DIFF = 1000 #kPa
+
+BackpressureRegulator0.On = DISABLE
+Pump0.On = DISABLE
+Analyzer0.On = ENABLE
+
+BackpressureRegulator1.On = DISABLE
+Pump1.On = DISABLE
+Analyzer1.On = ENABLE
+
+var pump0On = DISABLE
+var pump1On = DISABLE
+
+main:
+    var backpressureSetting0 = BackpressureRegulator0.Setting
+    var backpressureSetting1 = BackpressureRegulator1.Setting
+    var pressure0 = Analyzer0.Pressure
+    var pressure1 = Analyzer1.Pressure
+
+    var target0 = backpressureSetting0 - TARGET_DIFF
+    if pressure0 > target0
+        pump0On = DISABLE
+    else
+        pump0On = ENABLE
+    end
+
+    var target1 = backpressureSetting1 - TARGET_DIFF
+    if pressure1 > target1
+        pump1On = DISABLE
+    else
+        pump1On = ENABLE
+    end
+
+    Pump0.On = pump0On
+    Pump1.On = pump1On
+    BackpressureRegulator0.On = pump0On
+    BackpressureRegulator1.On = pump1On
+    db.Setting = pressure0
+    yield
+j main

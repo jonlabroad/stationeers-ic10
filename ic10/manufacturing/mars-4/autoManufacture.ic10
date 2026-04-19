@@ -2,10 +2,14 @@
 define ON 1
 define OFF 0
 
-define STEEL_SHEET_STACK_SIZE 30
+define STEEL_SHEET_STACK_SIZE 50
+define WALLS_STACK_SIZE 30
+define FRAMES_STACK_SIZE 30
+define PLASTIC_STACK_SIZE 50
 define outputHash HASH("StructureChuteExportBin")
 
 alias outputOccupied r0
+alias stackSize r2
 
 sb HASH("StructureAutolathe") ClearMemory ON
 
@@ -17,11 +21,55 @@ bnez autolatheActive checkIfDone
 
 steelSheets:
 lbns outputOccupied outputHash HASH("outSteelSheets") 0 Occupied Maximum
-bnez outputOccupied done # this will go to the next product when they are impl
+bnez outputOccupied flatWalls # next product
 
 # Create steel sheets
-s db Setting STEEL_SHEET_STACK_SIZE
+move stackSize STEEL_SHEET_STACK_SIZE
 sb HASH("StructureAutolathe") RecipeHash HASH("ItemSteelSheets")
+sb HASH("StructureAutolathe") ClearMemory ON
+sb HASH("StructureAutolathe") Activate ON
+j done
+
+flatWalls:
+lbns outputOccupied outputHash HASH("outFlatWalls") 0 Occupied Maximum
+bnez outputOccupied walls # next product
+
+# Create flat walls
+move stackSize WALLS_STACK_SIZE
+sb HASH("StructureAutolathe") RecipeHash HASH("ItemKitWallFlat")
+sb HASH("StructureAutolathe") ClearMemory ON
+sb HASH("StructureAutolathe") Activate ON
+j done
+
+walls:
+lbns outputOccupied outputHash HASH("outWalls") 0 Occupied Maximum
+bnez outputOccupied frames # next product
+
+# Create walls
+move stackSize WALLS_STACK_SIZE
+sb HASH("StructureAutolathe") RecipeHash HASH("ItemKitWall")
+sb HASH("StructureAutolathe") ClearMemory ON
+sb HASH("StructureAutolathe") Activate ON
+j done
+
+frames:
+lbns outputOccupied outputHash HASH("outFrames") 0 Occupied Maximum
+bnez outputOccupied plastic # next product
+
+# Create frames
+move stackSize FRAMES_STACK_SIZE
+sb HASH("StructureAutolathe") RecipeHash HASH("ItemSteelFrames")
+sb HASH("StructureAutolathe") ClearMemory ON
+sb HASH("StructureAutolathe") Activate ON
+j done
+
+plastic:
+lbns outputOccupied outputHash HASH("outPlastic") 0 Occupied Maximum
+bnez outputOccupied done # next product
+
+# Create plastic
+move stackSize PLASTIC_STACK_SIZE
+sb HASH("StructureAutolathe") RecipeHash HASH("ItemPlasticSheets")
 sb HASH("StructureAutolathe") ClearMemory ON
 sb HASH("StructureAutolathe") Activate ON
 j done
@@ -29,9 +77,8 @@ j done
 checkIfDone:
 alias exportCount r3
 lb exportCount HASH("StructureAutolathe") ExportCount Maximum 
-blt exportCount STEEL_SHEET_STACK_SIZE done
+blt exportCount stackSize done
 sb HASH("StructureAutolathe") Activate OFF
-
 
 done:
 yield

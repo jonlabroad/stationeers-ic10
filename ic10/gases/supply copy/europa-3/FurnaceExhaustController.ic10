@@ -1,0 +1,56 @@
+alias GasAnalyzer d0
+alias PurgePump d1
+
+define ON 1
+define OFF 0
+
+define STATE_IDLE 0
+define STATE_PURGING 1
+
+define PRESSURE_MAX 40000
+define PRESSURE_OFF 30000
+
+alias currState r0
+move currState STATE_IDLE
+main:
+s db Setting currState
+
+alias liquidVolume r1
+l liquidVolume GasAnalyzer VolumeOfLiquid
+
+alias pressure r2
+l pressure GasAnalyzer Pressure
+
+beq currState STATE_IDLE idleState
+beq currState STATE_PURGING purgingState
+j end
+
+idleState:
+# Check for liquid
+#bgtz liquidVolume turnOn
+# Check if pressure too high
+bgt pressure PRESSURE_MAX turnOn
+j end
+
+purgingState:
+alias result r3
+# Check if pressure is low enough to turn off
+slt result pressure PRESSURE_OFF
+slez r4 liquidVolume
+and result r4 result
+beq result 1 turnOff
+j end
+
+turnOn:
+s PurgePump On ON
+move currState STATE_PURGING
+j end
+
+turnOff:
+s PurgePump On OFF
+move currState STATE_IDLE
+j end
+
+end:
+yield
+j main

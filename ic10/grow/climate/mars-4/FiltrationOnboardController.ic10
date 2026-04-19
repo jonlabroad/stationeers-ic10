@@ -1,0 +1,44 @@
+define MAX_POLLUTANT_RATIO 0.005
+define MIN_POLLUTANT_RATIO 0.001
+
+define MAX_OXYGEN_RATIO 0.1
+define MIN_OXYGEN_RATIO 0.025
+
+define OFF 0
+define ON 1
+
+define IDLE 0
+define ACTIVE 1
+
+main:
+alias ratioPollutant r1
+l ratioPollutant db RatioPollutantInput
+
+alias ratioOxygen r2
+l ratioOxygen db RatioOxygenInput
+
+alias currentMode r3
+l currentMode db Mode
+
+bgtz currentMode filterIsOn
+
+filterIsOff:
+alias needPollFilter r4
+slt needPollFilter ratioPollutant MAX_POLLUTANT_RATIO
+alias needOxygenFilter r5
+slt needOxygenFilter ratioOxygen MAX_OXYGEN_RATIO
+alias needFilter r6
+or needFilter needPollFilter needOxygenFilter
+beqz needFilter end
+s db Mode ACTIVE
+j end
+
+filterIsOn:
+bgt ratioPollutant MIN_POLLUTANT_RATIO end
+bgt ratioOxygen MIN_OXYGEN_RATIO end
+s db Mode IDLE
+j end
+
+end:
+yield
+j main

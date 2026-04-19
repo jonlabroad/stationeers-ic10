@@ -1,0 +1,36 @@
+s d1 On 0
+s d0 On 0
+s d2 On 1
+s d4 On 0
+s d3 On 0
+s d5 On 1
+move r0 0
+move r1 0
+main:
+l r2 d1 Setting
+l r3 d4 Setting
+l r4 d2 Pressure
+l r5 d5 Pressure
+sub r6 r2 1000
+sgt r15 r4 r6
+beqz r15 if0else
+move r0 0
+j if0exit
+if0else:
+move r0 1
+if0exit:
+sub r7 r3 1000
+sgt r15 r5 r7
+beqz r15 if1else
+move r1 0
+j if1exit
+if1else:
+move r1 1
+if1exit:
+s d0 On r0
+s d3 On r1
+s d1 On r0
+s d4 On r1
+s db Setting r4
+yield
+j main

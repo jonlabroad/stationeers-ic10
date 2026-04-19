@@ -1,0 +1,76 @@
+alias Pump d0
+alias AtmoSensor d1
+alias OutdoorSensor d2
+alias CarbonDioxidePump d3
+alias DaylightSensor d4
+alias ExportChute d5
+
+define ON 1
+define OFF 0
+
+define MIN_PRESSURE 60
+define MAX_PRESSURE 85
+
+define MIN_CO2_RATIO 0.03
+define MAX_CO2_RATIO 0.07
+
+main:
+alias verticalReading r4
+alias horizontalReading r5
+l verticalReading DaylightSensor Vertical
+l horizontalReading DaylightSensor Horizontal
+s db Setting verticalReading
+
+growControl:
+alias lightsOn r6
+sgt lightsOn verticalReading 90
+sb HASH("StructureGrowLight") On lightsOn
+
+atmoControl:
+alias isActive r0
+l isActive Pump On
+
+alias co2PumpActive r3
+l co2PumpActive CarbonDioxidePump On
+
+alias currPressure r1
+l currPressure AtmoSensor Pressure
+
+bgtz isActive pumpIsOn
+# Pump is off
+bgt currPressure MIN_PRESSURE carbonDioxideCheck
+s Pump On ON
+j carbonDioxideCheck
+
+pumpIsOn:
+blt currPressure MAX_PRESSURE carbonDioxideCheck
+s Pump On OFF
+
+carbonDioxideCheck:
+alias co2Ratio r2
+l co2Ratio AtmoSensor RatioCarbonDioxide
+bgtz co2PumpActive co2PumpIsOn
+
+# CO2 pump is off
+bgt co2Ratio MIN_CO2_RATIO end
+s CarbonDioxidePump On ON
+j end
+
+co2PumpIsOn:
+blt co2Ratio MAX_CO2_RATIO end
+s CarbonDioxidePump On OFF
+j end
+
+end:
+# Flush bin if necessary
+alias binOccupied r7
+ls binOccupied ExportChute 0 Occupied
+beqz binOccupied notOccupied
+s ExportChute Open OFF
+j actualEnd
+notOccupied:
+s ExportChute Open ON
+
+actualEnd:
+yield
+j main

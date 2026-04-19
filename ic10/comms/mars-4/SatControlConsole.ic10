@@ -1,0 +1,26 @@
+alias Satellite d0
+
+main:
+alias currAz r0
+l currAz Satellite Horizontal
+
+alias currEl r1
+l currEl Satellite Vertical
+
+alias currAzInput r2
+lbn currAzInput HASH("ModularDeviceDial") HASH("Azimuth Input") Setting Maximum
+
+alias currElInput r3
+lbn currElInput HASH("ModularDeviceDial") HASH("Elevation Input") Setting Maximum
+
+# Set displays
+sbn HASH("ModularDeviceLEDdisplay2") HASH("Azimuth Display") Setting currAz
+sbn HASH("ModularDeviceLEDdisplay2") HASH("Elevation Display") Setting currEl
+
+# Command the radar
+s Satellite Horizontal currAzInput
+s Satellite Vertical currElInput
+
+end:
+yield
+j main
