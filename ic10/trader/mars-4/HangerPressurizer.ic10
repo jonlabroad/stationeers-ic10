@@ -1,0 +1,40 @@
+alias ActivateSwitch d0
+alias DirectionSwitch d1
+alias Sensor d2
+alias DoorLever d3
+
+define INWARD 1
+define OUTWARD 0
+
+define VentHash HASH("StructurePoweredVent")
+
+main:
+alias enabled r1
+l enabled ActivateSwitch Setting
+
+alias direction r2
+l direction DirectionSwitch Setting
+
+alias doorLever r3
+l doorLever DoorLever Setting
+sb HASH("StructureLargeHangerDoor") Open doorLever
+
+bnez enabled itsEnabled
+sb VentHash On 0
+j end
+
+itsEnabled:
+beqz direction vacuum
+sb VentHash On 1
+
+# Enable
+sb VentHash Mode OUTWARD
+j end
+
+vacuum:
+sb VentHash Mode INWARD
+j end
+
+end:
+yield
+j main

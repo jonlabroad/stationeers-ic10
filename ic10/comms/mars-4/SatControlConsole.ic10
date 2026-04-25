@@ -1,11 +1,21 @@
 alias Satellite d0
+alias Satellite2 d1
+
+define MIN_MED_POWER 500
+define MAX_MED_POWER 7000
+define MIN_LRG_POWER 2000
+define MAX_LRG_POWER 48000
 
 main:
+# Radar 1
 alias currAz r0
 l currAz Satellite Horizontal
 
 alias currEl r1
 l currEl Satellite Vertical
+
+alias currPower r5
+l currPower Satellite Setting
 
 alias currAzInput r2
 lbn currAzInput HASH("ModularDeviceDial") HASH("Azimuth Input") Setting Maximum
@@ -13,13 +23,42 @@ lbn currAzInput HASH("ModularDeviceDial") HASH("Azimuth Input") Setting Maximum
 alias currElInput r3
 lbn currElInput HASH("ModularDeviceDial") HASH("Elevation Input") Setting Maximum
 
+alias currPowerInput r4
+lbn currPowerInput HASH("ModularDeviceThrottle3x2") HASH("Throttle1") Setting Maximum
+mul currPowerInput currPowerInput MAX_MED_POWER
+add currPowerInput currPowerInput MIN_MED_POWER 
+
 # Set displays
 sbn HASH("ModularDeviceLEDdisplay2") HASH("Azimuth Display") Setting currAz
 sbn HASH("ModularDeviceLEDdisplay2") HASH("Elevation Display") Setting currEl
+sbn HASH("ModularDeviceLEDdisplay2") HASH("Power1") Setting currPower
 
 # Command the radar
+s db Setting currPowerInput
 s Satellite Horizontal currAzInput
 s Satellite Vertical currElInput
+s Satellite Setting currPowerInput
+
+# Radar 2
+l currAz Satellite2 Horizontal
+l currEl Satellite2 Vertical
+l currPower Satellite2 Setting
+
+lbn currAzInput HASH("ModularDeviceDial") HASH("Azimuth Input 2") Setting Maximum
+lbn currElInput HASH("ModularDeviceDial") HASH("Elevation Input 2") Setting Maximum
+lbn currPowerInput HASH("ModularDeviceThrottle3x2") HASH("Throttle2") Setting Maximum
+mul currPowerInput currPowerInput MAX_LRG_POWER
+add currPowerInput currPowerInput MIN_LRG_POWER
+
+# Set displays
+sbn HASH("ModularDeviceLEDdisplay2") HASH("Azimuth Display 2") Setting currAz
+sbn HASH("ModularDeviceLEDdisplay2") HASH("Elevation Display 2") Setting currEl
+sbn HASH("ModularDeviceLEDdisplay2") HASH("Power2") Setting currPower
+
+# Command the radar
+s Satellite2 Horizontal currAzInput
+s Satellite2 Vertical currElInput
+s Satellite2 Setting currPowerInput
 
 end:
 yield

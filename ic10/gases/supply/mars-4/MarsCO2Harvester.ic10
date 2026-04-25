@@ -1,0 +1,55 @@
+alias ImportVent d0
+alias AtmoTankAnalyzer d1
+alias CO2TankAnalyzer d2
+alias Filtration d3
+
+define VENT_INWARD 1
+
+define MIN_ATMO_TANK_PRESSURE 700
+define MAX_ATMO_TANK_PRESSURE 1000
+define MAX_CO2_TANK_PRESSURE 5000
+
+define STATE_IDLE 0
+define STATE_IMPORT 1
+
+alias currState r0
+
+move currState STATE_IDLE
+s ImportVent Mode VENT_INWARD
+main:
+s db Setting currState
+alias atmoTankPressure r1
+l atmoTankPressure AtmoTankAnalyzer Pressure
+alias co2TankPressure r2
+l co2TankPressure CO2TankAnalyzer Pressure
+alias filterInputPressure r3
+l filterInputPressure Filtration PressureInput
+
+# Always control filtration
+slt r4 co2TankPressure MAX_CO2_TANK_PRESSURE
+sgt r5 filterInputPressure 100
+and r4 r4 r5
+s Filtration On r4
+
+beq currState STATE_IDLE stateIdle
+beq currState STATE_IMPORT stateImport
+j end
+
+stateIdle:
+move currState STATE_IDLE
+s ImportVent On 0
+
+# Check if we can import CO2
+bge atmoTankPressure MIN_ATMO_TANK_PRESSURE end
+bge co2TankPressure MAX_CO2_TANK_PRESSURE end
+j stateImport
+
+stateImport:
+move currState STATE_IMPORT
+s ImportVent On 1
+bge atmoTankPressure MAX_ATMO_TANK_PRESSURE stateIdle
+j end
+
+end:
+yield
+j main
